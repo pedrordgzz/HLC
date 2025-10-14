@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Portfolio | Tu Nombre</title>
+  <meta name="description" content="Portfolio profesional: proyectos, habilidades y contacto." />
+  <link rel="preload" href="css/styles.css" as="style" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <a class="skip-link" href="#contenido">Saltar al contenido</a>
+  <header class="site-header">
+    <div class="container header__inner">
+      <a class="brand" href="#inicio">TuNombre<span class="accent">.</span></a>
+      <button class="nav__toggle" aria-expanded="false" aria-controls="nav">
+        <span class="sr-only">Abrir menú</span>☰
+      </button>
+      <nav id="nav" class="nav" aria-label="Principal">
+        <ul class="nav__list">
+          <li><a href="#proyectos">Proyectos</a></li>
+          <li><a href="#servicios">Servicios</a></li>
+          <li><a href="#sobre-mi">Sobre mí</a></li>
+          <li><a href="#habilidades">Habilidades</a></li>
+          <li><a href="#contacto">Contacto</a></li>
+          
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main id="contenido">
+    <section id="inicio" class="hero">
+      <div class="container hero__inner">
+        <div class="hero__copy">
+          <h1 class="hero__title">Desarrollador/a Web Freelance Morgado</h1>
+          <p class="hero__subtitle">Construyo sitios y apps rápidos, accesibles y responsivos.</p>
+          <div class="hero__actions">
+            <a class="btn btn--primary" href="#proyectos">Ver proyectos</a>
+            <a class="btn btn--ghost" href="#contacto">Contactar</a>
+          </div>
+        </div>
+        <div class="hero__media" aria-hidden="true">
+          <div class="avatar" role="img" aria-label="Avatar o logo"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="proyectos" class="section">
+      <div class="container">
+        <h2 class="section__title">Proyectos destacados</h2>
+        <div class="projects">
+          <article class="card project">
+            <div class="card__media"></div>
+            <div class="card__body">
+              <h3 class="card__title">Proyecto A</h3>
+              <p class="card__text">Landing responsive con Flexbox y SEO básico.</p>
+              <div class="card__tags">
+                <span class="tag">HTML</span><span class="tag">CSS</span><span class="tag">Flexbox</span>
+              </div>
+              <div class="card__actions">
+                <a class="btn btn--sm" href="#" target="_blank" rel="noreferrer">Demo</a>
+                <a class="btn btn--sm btn--ghost" href="#" target="_blank" rel="noreferrer">Código</a>
+              </div>
+            </div>
+          </article>
+
+          <article class="card project">
+            <div class="card__media"></div>
+            <div class="card__body">
+              <h3 class="card__title">Proyecto B</h3>
+              <p class="card__text">SPA ligera con buenas prácticas de accesibilidad.</p>
+              <div class="card__tags">
+                <span class="tag">JS</span><span class="tag">A11y</span>
+              </div>
+              <div class="card__actions">
+                <a class="btn btn--sm" href="#" target="_blank" rel="noreferrer">Demo</a>
+                <a class="btn btn--sm btn--ghost" href="#" target="_blank" rel="noreferrer">Código</a>
+              </div>
+            </div>
+          </article>
+
+          <article class="card project">
+            <div class="card__media"></div>
+            <div class="card__body">
+              <h3 class="card__title">Proyecto C</h3>
+              <p class="card__text">Dashboard con tarjetas y layout fluido.</p>
+              <div class="card__tags">
+                <span class="tag">HTML</span><span class="tag">CSS</span><span class="tag">RWD</span>
+              </div>
+              <div class="card__actions">
+                <a class="btn btn--sm" href="#" target="_blank" rel="noreferrer">Demo</a>
+                <a class="btn btn--sm btn--ghost" href="#" target="_blank" rel="noreferrer">Código</a>
+              </div>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="sobre-mi" class="section section--alt">
+      <div class="container about">
+        <div class="about__media"></div>
+        <div class="about__copy">
+          <h2 class="section__title">Sobre mí</h2>
+          <p>Hola, soy <strong>Tu Nombre</strong>. Me especializo en interfaces limpias, rendimiento y DX.</p>
+          <ul class="checklist">
+            <li>Mobile‑first y accesibilidad</li>
+            <li>Componentes reutilizables</li>
+            <li>CI/CD y despliegues modernos</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section id="habilidades" class="section">
+      <div class="container">
+        <h2 class="section__title">Habilidades</h2>
+        <ul class="skills">
+          <li class="skill"><span>HTML5</span></li>
+          <li class="skill"><span>CSS3 / Flexbox</span></li>
+          <li class="skill"><span>JavaScript</span></li>
+          <li class="skill"><span>TypeScript</span></li>
+          <li class="skill"><span>React / Next.js</span></li>
+          <li class="skill"><span>NestJS</span></li>
+        </ul>
+      </div>
+    </section>
+
+    <section id="contacto" class="section section--alt">
+      <div class="container contact">
+        <h2 class="section__title">Contacto</h2>
+        <form class="form" action="#" method="post" autocomplete="on">
+          <div class="form__row">
+            <label for="nombre">Nombre</label>
+            <input id="nombre" name="nombre" type="text" placeholder="Tu nombre" required />
+          </div>
+          <div class="form__row">
+            <label for="email">Email</label>
+            <input id="email" name="email" type="email" placeholder="tucorreo@ejemplo.com" required />
+          </div>
+          <div class="form__row">
+            <label for="mensaje">Mensaje</label>
+            <textarea id="mensaje" name="mensaje" rows="4" placeholder="Cuéntame tu idea"></textarea>
+          </div>
+          <button class="btn btn--primary" type="submit">Enviar</button>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer__inner">
+      <p>© <span id="year"></span> Tu Nombre. Todos los derechos reservados.</p>
+      <ul class="social">
+        <li><a href="#" aria-label="GitHub">GitHub</a></li>
+        <li><a href="#" aria-label="LinkedIn">LinkedIn</a></li>
+        <li><a href="#" aria-label="X/Twitter">X</a></li>
+      </ul>
+    </div>
+  </footer>
+
+  <script>
+    // Menú responsive (sin dependencias)
+    const toggle = document.querySelector('.nav__toggle');
+    const nav = document.getElementById('nav');
+    toggle?.addEventListener('click', () => {
+      const expanded = toggle.getAttribute('aria-expanded') === 'true';
+      toggle.setAttribute('aria-expanded', String(!expanded));
+      nav.classList.toggle('is-open');
+    });
+    // Año en footer
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
