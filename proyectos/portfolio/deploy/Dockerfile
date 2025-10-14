@@ -7,6 +7,6 @@ FROM httpd:2.4
 #directorio de trabajo dentro del contenedor
 WORKDIR /usr/local/apache2/htdocs
 # el directorio . es relativo al contexto del Docker Compose
-COPY ./src .
+COPY src .
 EXPOSE 80
 
