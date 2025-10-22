@@ -2,7 +2,6 @@
 FROM ubuntu
 RUN apt update && apt install -yq --no-install-recommends \ 
     apache2 \
-    libapache2-mod-php7.2 \
     nano \
     curl \
     net-tools iputils-ping
