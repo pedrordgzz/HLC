@@ -2,6 +2,8 @@ services:
   web:
     build: 
       context: .. #portfolio
+      args: #variables en dockerfile para la construcción de la
+        - USUARIO=pedro
       dockerfile: ./deploy/Dockerfile
     container_name: ctportfolio
     ports:
