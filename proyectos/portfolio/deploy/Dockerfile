@@ -8,7 +8,7 @@ RUN apt update && apt install -yq --no-install-recommends \
     net-tools iputils-ping
 # *** Creación de usuario *** 
 RUN useradd -rm -d /home/pedro -s /bin/bash pedro
-RUN echo "pedro:1234" | chapasswd 
+RUN echo "pedro:1234" | chpasswd 
 RUN echo "Bienvenido a la empresa, Pedro" > /home/pedro/hola.txt
 #debemos consultar el docker hub (imagen) para ver variables de entorno
 #directorios de trabajo etc etc
