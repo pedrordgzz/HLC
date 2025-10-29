@@ -1,6 +1,5 @@
 FROM ubuntu
 ARG USUARIO
-ARG PASSWORD
 RUN apt update && apt install -yq --no-install-recommends \ 
     nano \
     git curl \
@@ -8,6 +7,6 @@ RUN apt update && apt install -yq --no-install-recommends \
     sudo
 
 RUN useradd -rm -d /home/${USUARIO} -s /bin/bash ${USUARIO}
-RUN echo "${USUARIO}:${PASSWORD}" | chpasswd 
+RUN echo "${USUARIO}:1234" | chpasswd 
 RUN echo "Bienvenido a la empresa, ${USUARIO}" > /home/${USUARIO}/hola.txt
 
