@@ -11,6 +11,8 @@ RUN mkdir -p /root/admin/base
 WORKDIR /root/admin/base  
 #Directorio fijado, con el que hago referencia a la hora de hacer las cosas, por eso uso el . (parecido al contexto)
 COPY ./dockerfiles/base/admin/start.sh .
+
+#COPY ./admin/start.sh . (Usado para Docker Build, ya que aquí es la ruta relativa al directorio donde me encuentro, no al contexto.)
 RUN chmod +x ./start.sh
 
 ENTRYPOINT [ "./start.sh"]
