@@ -1,0 +1,11 @@
+services:
+  web:
+    build: 
+      context: /home/pedro/HLC/devops/Docker/Caronte
+      args: #variables en dockerfile para la construcción de la imagen
+        - USUARIO=pedro
+      dockerfile: ./dockerfiles/base/ubbase
+    container_name: ctpbase
+    ports:
+      - "8810:80"
+
