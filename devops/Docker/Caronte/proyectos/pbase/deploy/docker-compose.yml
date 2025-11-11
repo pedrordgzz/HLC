@@ -8,5 +8,5 @@ services:
     container_name: ctpbase
     ports:
       - "8810:80"
-    environmment: #variables que se usan cuando se ejecuta el contenedor.
+    environment: #variables que se usan cuando se ejecuta el contenedor.
         - USUARIO=pedro
