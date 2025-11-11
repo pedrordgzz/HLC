@@ -11,3 +11,5 @@ services:
     environment: #variables que se usan cuando se ejecuta el contenedor.
         - USUARIO=pedro
         - PASSWORD=pswpedro
+    volumes:
+      - ./logs:/root/logs
