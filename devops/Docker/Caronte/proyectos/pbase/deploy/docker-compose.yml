@@ -5,8 +5,8 @@ services:
       #args: #variables en dockerfile para la construcción de la imagen
       #  - USUARIO=pedro
       dockerfile: ./dockerfiles/base/ubbase
-      container_name: ctpbase
-      ports:
+    container_name: ctpbase
+    ports:
       - "8810:80"
     environment: #variables que se usan cuando se ejecuta el contenedor.
         - USUARIO=pedro
