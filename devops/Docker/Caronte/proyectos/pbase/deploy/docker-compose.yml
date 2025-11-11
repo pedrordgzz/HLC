@@ -10,3 +10,4 @@ services:
       - "8810:80"
     environment: #variables que se usan cuando se ejecuta el contenedor.
         - USUARIO=pedro
+        - PASSWORD=pswpedro
