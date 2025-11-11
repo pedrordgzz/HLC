@@ -20,7 +20,7 @@ newUser(){
     useradd -rm -d /home/${USUARIO} -s /bin/bash ${USUARIO}
     echo "${USUARIO}:${PASSWORD}" | chpasswd
     echo "Bienvenido ${USUARIO} ..." > /home/${USUARIO}/bienvenida.txt
-
+fi
 }
 
 main(){
