@@ -4,10 +4,9 @@ services:
       context: /home/pedro/HLC/devops/Docker/Caronte
       #args: #variables en dockerfile para la construcción de la imagen
       #  - USUARIO=pedro
-      environmment: #variables que se usan cuando se ejecuta el contenedor.
-        - USUARIO=pedro
-      dockerfile: ./dockerfiles/base/ubbase
+    dockerfile: ./dockerfiles/base/ubbase
     container_name: ctpbase
     ports:
       - "8810:80"
-
+    environmment: #variables que se usan cuando se ejecuta el contenedor.
+        - USUARIO=pedro
