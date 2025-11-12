@@ -13,7 +13,7 @@ check-usuario(){
     fi
 }
 
-check-usuario(){
+check-home(){
     if [ ! -d "/home/${USUARIO}" ]; 
     then
         echo "El directorio /home/${USUARIO} no existe." >> /root/logs/informe.log
