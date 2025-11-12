@@ -1,15 +1,14 @@
 services:
   web:
     build: 
-      context: /home/pedro/HLC/devops/Docker/Caronte
+      context: ${CONTEXTO}
       #args: #variables en dockerfile para la construcción de la imagen
       #  - USUARIO=pedro
       dockerfile: ./dockerfiles/base/ubbase
-    container_name: ctpbase
+    container_name: ${NOMBRE}
     ports:
       - "8810:80"
-    environment: #variables que se usan cuando se ejecuta el contenedor.
-        - USUARIO=pedro
-        - PASSWORD=pswpedro
+    env_file:
+      - ./.env
     volumes:
       - ./logs:/root/logs
