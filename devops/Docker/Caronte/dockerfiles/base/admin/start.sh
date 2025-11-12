@@ -1,7 +1,7 @@
 #!/bin/bash
 
 set -e #Carga las variables de entorno, pasadas desde el docker-compose.
-source /root/admin/usuarios/mainusers.sh
+source /root/admin/base/usuarios/mainusers.sh
 
 main(){
     touch /root/logs/informe.log
