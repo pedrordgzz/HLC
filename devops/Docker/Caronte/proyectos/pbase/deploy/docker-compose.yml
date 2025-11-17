@@ -7,7 +7,7 @@ services:
       dockerfile: ./dockerfiles/base/ubbase
     container_name: ${NOMBRE}
     ports:
-      - ${PORT_SSH}:${PORT_SSH}
+      - 8810:80
     env_file:
       - ./.env
     volumes:
