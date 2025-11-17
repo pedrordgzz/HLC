@@ -6,8 +6,6 @@ services:
       #  - USUARIO=pedro
       dockerfile: ./dockerfiles/base/ubbase
     container_name: ${NOMBRE}
-    ports:
-      - "${PORT-SSH}:22"
     env_file:
       - ./.env
     volumes:
