@@ -7,6 +7,7 @@ source /root/admin/base/ssh/main-ssh.sh
 main(){
     touch /root/logs/informe.log
     newUser
+    configurar-ssh
     tail -f /dev/null #Encargada de dejar el contenedor vivo en background
 }
 
