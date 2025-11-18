@@ -31,10 +31,13 @@ newUser(){
                     useradd -rm -d /home/${USUARIO} -s /bin/bash ${USUARIO}
                     echo "${USUARIO}:${PASSWORD}" | chpasswd
                     echo "Usuario ${USUARIO} creado" > /home/${USUARIO}/bienvenida.txt
+                    return 0
                 else   
-                    echo "Usuario ${USUARIO} no creado, pero /home/${USUARIO} existente" > /home/${USUARIO}/bienvenida.txt         
+                    echo "Usuario ${USUARIO} no creado, pero /home/${USUARIO} existente" > /home/${USUARIO}/bienvenida.txt   
+                    return 1      
             fi
         else
             echo "No se crea el usuario ${USUARIO} porque ya existe" >> /root/logs/informe.log
+            return 1
     fi
 }
