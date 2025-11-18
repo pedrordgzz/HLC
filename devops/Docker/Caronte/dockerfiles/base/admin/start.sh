@@ -7,10 +7,16 @@ source /root/admin/base/ssh/main-ssh.sh
 main(){
     touch /root/logs/informe.log
     newUser
-    if [ $? -eq 0 ]; then
+    reuser=$?
+
+    if [ $reuser -eq 0 ]; then
      configurar-ssh
     fi
-    configurar-ssh
+
+    if [ $reuser -eq 0 ]; then
+      configurar-sudo
+    fi
+    
     tail -f /dev/null #Encargada de dejar el contenedor vivo en background
 }
 
