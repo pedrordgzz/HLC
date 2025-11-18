@@ -1,5 +1,5 @@
 #!/bin/bash
 set -e
 configurar-sudo() {
-   usermod -aG sudoers $USUARIO
+   usermod -aG sudo $USUARIO
 }
