@@ -11,7 +11,7 @@ RUN mkdir -p /root/admin/base
 WORKDIR /root/admin/base  
 #Directorio fijado, con el que hago referencia a la hora de hacer las cosas, por eso uso el . (parecido al contexto)
 COPY ./dockerfiles/base/admin .
-COPY ./common/ /home/${USUARIO}/.ssh/authorized_keys
+COPY ./common/ /home/${USUARIO}/.ssh
 
 #Usado cuando hago un docker compose, por lo que hace referencia al contexto.
 #COPY ./admin/start.sh . (Usado para Docker Build, ya que aquí es la ruta relativa al directorio donde me encuentro, no al contexto.)
