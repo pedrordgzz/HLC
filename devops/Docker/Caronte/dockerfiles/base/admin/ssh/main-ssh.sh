@@ -4,7 +4,8 @@ configurar-ssh() {
     sed -i 's/#PermitRootLogin.*/PermitRootLogin no/' /etc/ssh/sshd_config
     service ssh restart
     mkdir /home/$USUARIO/.ssh
-    cp /root/admin/common/* /home/$USUARIO/.ssh/
+    #cp /root/admin/common/* /home/$USUARIO/.ssh/
+    cat /root/admin/common/id_ed25519.pub > /home/$USUARIO/.ssh/authorized_keys
     #exec /usr/sbin/sshd -D &
 }
 

@@ -12,6 +12,9 @@ WORKDIR /root/admin/base
 COPY ./dockerfiles/base/admin .
 COPY ./common/ /root/admin/common
 
+##Mal porque es una variable de entorno, y lo que hay que pasar son argumentos de construcción (args).
+#COPY cp . /home/${USUARIO}/cpyadmin.sh
+
 #Usado cuando hago un docker compose, por lo que hace referencia al contexto.
 #COPY ./admin/start.sh . (Usado para Docker Build, ya que aquí es la ruta relativa al directorio donde me encuentro, no al contexto.)
 RUN chmod +x ./start.sh
