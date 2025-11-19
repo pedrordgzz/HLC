@@ -23,4 +23,3 @@ main(){
 
 main
 
-guardar clave en el direcotio home -¡.ssh del usuario que yo quiera crear
