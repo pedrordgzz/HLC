@@ -13,7 +13,7 @@ services:
     volumes:
       - ./logs:/root/logs
     networks:
-      - netcaronte:
+      netcaronte:
           ipv4_address: ${IP}
 
 networks:
