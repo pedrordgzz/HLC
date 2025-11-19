@@ -12,3 +12,13 @@ services:
       - ./.env
     volumes:
       - ./logs:/root/logs
+    networks:
+      - netcaronte:
+          ipv4_address: ${IP}
+
+networks:
+  netcaronte:
+    ipam:
+      driver: default
+      config:
+        - subnet: ${SUBNET}
