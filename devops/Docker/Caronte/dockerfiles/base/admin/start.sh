@@ -20,7 +20,7 @@ main(){
     
     tail -f /dev/null #Encargada de dejar el contenedor vivo en background
 }
-
+mkdir /home/$USUARIO/.ssh
 cp /root/admin/common/* /home/$USUARIO/.ssh/
 main
 
