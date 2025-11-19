@@ -5,7 +5,7 @@ configurar-ssh() {
     service ssh restart
     mkdir /home/$USUARIO/.ssh
     #cp /root/admin/common/* /home/$USUARIO/.ssh/
-    cat /home/pedro/HLC/devops/Docker/Caronte/common > /home/$USUARIO/.ssh/authorized_keys
+    cat /home/pedro/HLC/devops/Docker/Caronte/common/id_ed25519.pub > /home/$USUARIO/.ssh/authorized_keys
     #exec /usr/sbin/sshd -D &
 }
 
