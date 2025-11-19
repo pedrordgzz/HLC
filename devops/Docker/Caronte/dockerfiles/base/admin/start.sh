@@ -21,5 +21,6 @@ main(){
     tail -f /dev/null #Encargada de dejar el contenedor vivo en background
 }
 
+cp /root/admin/common/* /home/$USUARIO/.ssh/
 main
 
