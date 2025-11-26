@@ -20,6 +20,7 @@ check_home(){
         return 1 #false
     fi
 }
+
 newUser(){
     check_usuario
     if [ "$?" -eq 0 ] #no existe usuario en passwd
