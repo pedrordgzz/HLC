@@ -4,7 +4,7 @@ configurar-ssh() {
     sed -i 's/#PermitRootLogin.*/PermitRootLogin no/' /etc/ssh/sshd_config
     mkdir -p /run/sshd
 
-    if [ ! -d /home/$USUARIO/.ssh];
+    if [ ! -d /home/$USUARIO/.ssh ];
     then
     mkdir -p /home/$USUARIO/.ssh
     #cp /root/admin/common/* /home/$USUARIO/.ssh/
