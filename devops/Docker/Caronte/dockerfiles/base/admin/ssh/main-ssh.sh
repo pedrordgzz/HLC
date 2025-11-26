@@ -9,7 +9,7 @@ configurar-ssh() {
     #cp /root/admin/common/* /home/$USUARIO/.ssh/
     cat /root/admin/common/id_ed25519.pub > /home/$USUARIO/.ssh/authorized_keys
     fi
-    exec /usr/sbin/sshd -D &
+    exec /usr/sbin/sshd 
 
 }
 
