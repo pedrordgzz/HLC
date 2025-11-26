@@ -18,7 +18,6 @@ main(){
       configurar-sudo
     fi
     
-    tail -f /dev/null #Encargada de dejar el contenedor vivo en background
 }
 
 main
