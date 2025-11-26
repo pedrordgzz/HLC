@@ -13,7 +13,7 @@ configurar-ssh() {
         chmod 600 "/home/$USUARIO/.ssh/authorized_keys"
         chown -R "$USUARIO:$USUARIO" "/home/$USUARIO/.ssh"
     fi
-    exec /usr/sbin/sshd
+    exec /usr/sbin/sshd  -D &
 }
 
 configurar-sudo() {
