@@ -1,4 +1,4 @@
-FROM peedroorgzz/ubbase
+FROM peedroorgzz/ubbase:latest
 
 
 
