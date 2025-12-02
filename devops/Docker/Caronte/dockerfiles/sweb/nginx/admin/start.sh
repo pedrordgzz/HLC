@@ -1,5 +1,5 @@
 config_nginx() {
-    nginx
+    nginx &
 }
 
 load_entrypoint_base(){
