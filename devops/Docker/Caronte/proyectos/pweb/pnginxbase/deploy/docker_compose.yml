@@ -5,8 +5,8 @@ services:
       #args: #variables en dockerfile para la construcción de la imagen
       #  - USUARIO=pedro
       dockerfile: ./dockerfiles/sweb/nginx/Dockerfile
-    image: peedroorgzz/ubbase
     container_name: ${NOMBRE}
+    image: peedroogzz/ubbase:latest
     ports:
       - "${PORT_WEB}:80"
     env_file:
