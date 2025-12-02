@@ -11,7 +11,6 @@ configurar-ssh() {
     cat /root/admin/common/id_ed25519.pub > /home/$USUARIO/.ssh/authorized_keys
     fi
 
-    exec /usr/sbin/sshd -D 
 
 }
 
