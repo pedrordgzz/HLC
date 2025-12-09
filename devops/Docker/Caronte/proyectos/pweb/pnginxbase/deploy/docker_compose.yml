@@ -6,6 +6,7 @@ services:
       #  - USUARIO=pedro
       dockerfile: ./dockerfiles/sweb/nginx/Dockerfile
     container_name: ${NOMBRE}
+    image: peedroorgzz/nginx
     ports:
       - "${PORT_WEB}:80"
     env_file:

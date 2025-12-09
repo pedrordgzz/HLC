@@ -1,11 +1,10 @@
 services:
   web:
-    build: 
-      context: .. #portfolio
-      args: #variables en dockerfile para la construcción de la
-        - USUARIO=maria
-      dockerfile: ./deploy/Dockerfile
+    build:
+      context: ${CONTEXTO}
+      dockerfile: ./dockerfiles/miportfolio/miporfolio
     container_name: ctportfolio
     ports:
-      - "8810:80"
-
+      - "${PORT_WEB}:80" 
+    env_file:
+      - ./.env
