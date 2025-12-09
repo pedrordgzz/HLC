@@ -1,7 +1,7 @@
 services:
   web:
     build:
-      context: ${CONTEXTO}
+      context: ../${CONTEXTO}
       dockerfile: ./dockerfiles/portfolio/Dockerfile
     container_name: ctportfolio
     ports:
