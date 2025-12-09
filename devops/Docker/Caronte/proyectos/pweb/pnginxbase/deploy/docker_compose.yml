@@ -5,8 +5,8 @@ services:
       #args: #variables en dockerfile para la construcción de la imagen
       #  - USUARIO=pedro
       dockerfile: ./dockerfiles/sweb/nginx/Dockerfile
+      image: peedroorgzz/nginx
     container_name: ${NOMBRE}
-    image: peedroorgzz/nginx
     ports:
       - "${PORT_WEB}:80"
     env_file:
