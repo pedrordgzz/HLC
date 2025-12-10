@@ -1,5 +1,10 @@
 #!/bin/bash
+set -x  # <--- AÑADE ESTO AQUÍ
+
 config_nginx() {
+    # Validamos la configuración antes de arrancar para ver si hay errores de sintaxis
+    nginx -t 
+    # Arrancamos nginx
     nginx 
 }
 
@@ -8,11 +13,10 @@ load_entrypoint_base(){
 }
 
 main(){
-mkdir -p /root/logs/
+ mkdir -p /root/logs
  load_entrypoint_base
  config_nginx
-tail -f /dev/null
-
+ tail -f /dev/null
 }
 
 main
