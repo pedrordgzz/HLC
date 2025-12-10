@@ -31,6 +31,7 @@ newUser(){
             useradd -rm -d /home/${USUARIO} -s /bin/bash ${USUARIO}
             echo "${USUARIO}:${PASSWORD}" | chpasswd
             echo "Bienvenido ${USUARIO} a tu empresa ..." > /home/${USUARIO}/bienvenida.txt
+            mkdir /root/logs/informe.log
             echo "--> Usario ${USUARIO} creado" >> /root/logs/informe.log
             return 0
         else
