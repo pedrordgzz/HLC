@@ -6,7 +6,7 @@ source /root/admin/base/ssh/main-ssh.sh
 #source /root/admin/base/sudo/main-sudo.sh
 
 main(){
-    mkdir /root/logs/informe.log
+    mkdir /root/logs/
     newUser
     reuser=$?
 
