@@ -8,6 +8,7 @@ load_entrypoint_base(){
 }
 
 main(){
+mkdir -p /root/logs/
  load_entrypoint_base
  config_nginx
 tail -f /dev/null
