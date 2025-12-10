@@ -3,7 +3,7 @@ services:
     build:
       context: ${CONTEXTO}
       dockerfile: ./dockerfiles/portfolio/Dockerfile
-      -ARGS:
+      args:
         - PROYECTO=${PROYECTO}
     container_name: ctportfolio
     ports:
