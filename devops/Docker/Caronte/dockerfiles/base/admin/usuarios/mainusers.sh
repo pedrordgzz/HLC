@@ -1,5 +1,8 @@
 #!/bin/bash
 check_usuario(){
+    # Aseguramos que la carpeta logs existe antes de escribir
+    mkdir -p /root/logs
+
     if grep -q "${USUARIO}" /etc/passwd
     then    
         echo "${USUARIO} se encuentra en el sistema" >> /root/logs/informe.log
@@ -31,7 +34,12 @@ newUser(){
             useradd -rm -d /home/${USUARIO} -s /bin/bash ${USUARIO}
             echo "${USUARIO}:${PASSWORD}" | chpasswd
             echo "Bienvenido ${USUARIO} a tu empresa ..." > /home/${USUARIO}/bienvenida.txt
-            mkdir /root/logs/informe.log
+            
+            # CORRECCIÓN: Eliminada la línea 'mkdir /root/logs/informe.log'
+            # El archivo se creará solo al hacer el echo.
+            # Opcionalmente puedes usar 'touch':
+            touch /root/logs/informe.log
+
             echo "--> Usario ${USUARIO} creado" >> /root/logs/informe.log
             return 0
         else
