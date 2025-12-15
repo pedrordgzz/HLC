@@ -31,6 +31,8 @@ load_entrypoint_nginx(){
     # Llama al script de la imagen base que arranca Nginx
     # Esto debe ser lo ÚLTIMO porque ese script se queda ejecutando (daemon off)
     bash /root/admin/sweb/nginx/admin/start.sh
+    service nginx reload
+    service nginx start
 }
 
 main(){
