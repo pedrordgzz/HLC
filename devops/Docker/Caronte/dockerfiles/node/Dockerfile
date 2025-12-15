@@ -1,31 +1,27 @@
-FROM peedroorgzz/ubbase:latest
+FROM peedroorgzz/nginx:latest
 
+# Recibe el argumento desde docker-compose
 ARG PROYECTO
 
 USER root
 
+# CORRECCIÓN: Se eliminó la barra invertida '\' después de npm para cerrar el comando
 RUN apt-get update && apt-get install -yq --no-install-recommends \
-    nginx \
     nodejs \
-    npm \
-    build-essential \
-    && apt-get clean && rm -rf /var/lib/apt/lists/*
+    npm
 
-RUN chown -R www-data:www-data /var/www/html \
-    && chmod -R 755 /var/www/html \
-    && mkdir -p /var/log/nginx \
-    && ln -sf /dev/stdout /var/log/nginx/access.log \
-    && ln -sf /dev/stderr /var/log/nginx/error.log
-
+# Copia de configuraciones de Nginx
 RUN mkdir -p /root/admin/sweb/nginx
 COPY ./dockerfiles/sweb/nginx /root/admin/sweb/nginx
 
-# --- ESTA PARTE ES LA QUE CREA LA CARPETA QUE TE FALTA ---
+# Copia del código fuente de la aplicación (pokeapi) al interior de la imagen
 WORKDIR /root/admin/base/app
 COPY ./proyectos/${PROYECTO}/ .
-# ---------------------------------------------------------
 
+# Permisos de ejecución para el script de inicio
 RUN chmod +x /root/admin/sweb/nginx/admin/start.sh
+
+# Configuración final
 WORKDIR /root/admin/sweb/nginx
 EXPOSE 80
 
