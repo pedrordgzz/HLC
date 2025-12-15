@@ -40,6 +40,7 @@ compile_and_deploy(){
 load_entrypoint_nginx(){
     # Arranca Nginx (daemon off)
     bash /root/admin/sweb/nginx/admin/start.sh
+    service nginx start
 }
 
 main(){
