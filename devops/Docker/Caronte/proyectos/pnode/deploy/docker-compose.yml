@@ -14,7 +14,7 @@ services:
     image: peedroorgzz/nodejs
     volumes:
       - ./logs:/root/logs      
-      - ../pokeapi/:/root/admin/node/proyectos/pokeapi/
+      - ../../pokeapi/:/root/admin/node/proyectos/pokeapi/
     networks:
       netpokeapi:
         ipv4_address: ${IP}
