@@ -1,0 +1,25 @@
+services:
+  web:
+    build:
+      context: ${CONTEXTO}
+      dockerfile: ./dockerfiles/pokeapi/Dockerfile
+    container_name: ${NOMBRE}
+    ports:
+      - "80:80"   
+      - "443:443"  
+    env_file:
+      - ./.env
+    image: peedroorgzz/nodejs
+    volumes:
+      - ./logs:/root/logs      
+      - ../pokeapi/:/root/admin/node/proyectos/pokeapi/
+    networks:
+      netpokeapi:
+        ipv4_address: ${IP}
+networks:
+  netpokeapi:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: ${SUBNET}
