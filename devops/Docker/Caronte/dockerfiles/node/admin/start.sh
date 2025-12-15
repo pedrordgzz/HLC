@@ -1,35 +1,29 @@
 #!/bin/bash
+set -e
 
-set -e 
-
-load_entrypoint_nginx(){
-bash /root/admin/sweb/nginx/admin/start.sh 
-}
-
-workdir(){
-    cd /root/admin/node/proyectos/pokeapi
-}
-
-dependencias(){
+deploy_app(){
+    cd /root/admin/base/$PROYECTO
     npm install
     npm run build
-    cp -r dist/* /var/www/html/
+    
+    rm -rf /var/www/html/*
+    
+    if [ -d "dist" ]; then
+        cp -r dist/. /var/www/html/
+    elif [ -d "build" ]; then
+        cp -r build/. /var/www/html/
+    fi
+    
+    chown -R www-data:www-data /var/www/html
 }
 
-
-nginxreload(){
-    nginx -t
-    service nginx reload
-    service nginx start
+load_entrypoint_nginx(){
+    bash /root/admin/sweb/nginx/admin/start.sh
 }
-
 
 main(){
+    deploy_app
     load_entrypoint_nginx
-    workdir
-    dependencias
-    nginxreload
-    tail -f /dev/null
 }
 
 main
