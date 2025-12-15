@@ -1,15 +1,31 @@
-FROM peedroorgzz/nginx
+FROM peedroorgzz/nginx:latest
 
-RUN apt install -yq --no-install-recommends \
+ARG PROYECTO
+
+USER root
+RUN apt update && apt install -yq --no-install-recommends \
+    nginx \
     nodejs \
-    npm
+    npm \
+    build-essential
 
-RUN mkdir -p /root/admin/node
-RUN mkdir -p /root/admin/node/proyectos/${PROYECTO}
-WORKDIR /root/admin/node
-COPY ./proyectos/${PROYECTO}/ /root/admin/node/proyectos/${PROYECTO}
+# Configuración Nginx (Igual que tenías)
+RUN chown -R www-data /var/www/html
+RUN chmod -R 755 /var/www/html
+RUN mkdir -p /var/log/nginx
+RUN ln -sf /dev/stdout /var/log/nginx/access.log \
+    && ln -sf /dev/stderr /var/log/nginx/error.log
 
-COPY ./dockerfiles/node/admin/start.sh .
-RUN chmod +x /root/admin/node/start.sh
+# Copiamos scripts de admin
+RUN mkdir -p /root/admin/sweb/nginx
+COPY ./dockerfiles/sweb/nginx /root/admin/sweb/nginx
 
-ENTRYPOINT [ "./start.sh" ]
+# --- NUEVO: Copiamos el código fuente de tu proyecto para compilarlo ---
+WORKDIR /root/admin/base/${PROYECTO}
+COPY ./proyectos/${PROYECTO}/ .
+# ----------------------------------------------------------------------
+
+RUN chmod +x /root/admin/sweb/nginx/admin/start.sh
+WORKDIR /root/admin/sweb/nginx
+
+ENTRYPOINT ["./admin/start.sh"]

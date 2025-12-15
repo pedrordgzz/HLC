@@ -20,6 +20,7 @@ dependencias(){
 nginxreload(){
     nginx -t
     service nginx reload
+    service nginx start
 }
 
 
