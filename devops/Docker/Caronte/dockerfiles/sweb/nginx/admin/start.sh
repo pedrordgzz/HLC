@@ -2,10 +2,8 @@
 set -e
 
 config_nginx() {
-    # Validamos la configuración antes de arrancar para ver si hay errores de sintaxis
-    nginx -t 
-    # Arrancamos nginx
-    nginx 
+    service nginx restart
+    nginx
 }
 
 load_entrypoint_base(){
