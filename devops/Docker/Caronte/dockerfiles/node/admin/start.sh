@@ -2,9 +2,7 @@
 set -e
 
 deploy_app(){
-    # Ahora siempre entra en 'app', da igual el nombre del proyecto
     cd /root/admin/base/app
-    
     npm install
     npm run build
     

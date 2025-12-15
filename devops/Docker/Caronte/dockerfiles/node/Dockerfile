@@ -20,10 +20,10 @@ RUN chown -R www-data:www-data /var/www/html \
 RUN mkdir -p /root/admin/sweb/nginx
 COPY ./dockerfiles/sweb/nginx /root/admin/sweb/nginx
 
-# --- CAMBIO AQUÍ: Usamos una carpeta fija 'app' ---
+# --- ESTA PARTE ES LA QUE CREA LA CARPETA QUE TE FALTA ---
 WORKDIR /root/admin/base/app
 COPY ./proyectos/${PROYECTO}/ .
-# --------------------------------------------------
+# ---------------------------------------------------------
 
 RUN chmod +x /root/admin/sweb/nginx/admin/start.sh
 WORKDIR /root/admin/sweb/nginx
