@@ -3,9 +3,10 @@ services:
     build:
       context: ${CONTEXTO}
       dockerfile: ./dockerfiles/pokeapi/Dockerfile
-    container_name: ${NOMBRE}
-    args:
+      # 'args' belongs here, inside 'build'
+      args:
         - PROYECTO=${PROYECTO}
+    container_name: ${NOMBRE}
     ports:
       - "${PORT_WEB}:80"   
     env_file:
@@ -17,6 +18,7 @@ services:
     networks:
       netpokeapi:
         ipv4_address: ${IP}
+
 networks:
   netpokeapi:
     driver: bridge
