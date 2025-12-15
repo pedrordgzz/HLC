@@ -2,6 +2,7 @@
 set -e
 
 deploy_app(){
+    mkdir -p /root/admin/base/app
     cd /root/admin/base/app
     npm install
     npm run build
