@@ -3,7 +3,7 @@
 set -e 
 
 load_entrypoint_nginx(){
-    bash /root/admin/nginx/admin/start.sh
+    bash /root/admin/nginx/start.sh
 }
 
 workdir(){
