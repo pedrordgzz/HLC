@@ -1,28 +1,37 @@
-FROM peedroorgzz/nginx:latest
+# 1. Usamos tu imagen base que ya tiene Nginx configurado
+FROM peedroorgzz/nginx
 
-# Recibe el argumento desde docker-compose
+# 2. Recibimos el nombre del proyecto (pokeapi)
 ARG PROYECTO
 
 USER root
 
-# CORRECCIÓN: Se eliminó la barra invertida '\' después de npm para cerrar el comando
+# 3. Instalamos SOLO Node.js y NPM (Nginx ya viene en la imagen base)
 RUN apt-get update && apt-get install -yq --no-install-recommends \
     nodejs \
-    npm
+    npm \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Copia de configuraciones de Nginx
-RUN mkdir -p /root/admin/sweb/nginx
-COPY ./dockerfiles/sweb/nginx /root/admin/sweb/nginx
-
-# Copia del código fuente de la aplicación (pokeapi) al interior de la imagen
+# 4. COPIA DEL CÓDIGO (Ruta Corregida)
+#    Creamos el directorio de trabajo
 WORKDIR /root/admin/base/app
-COPY ./proyectos/${PROYECTO}/ .
 
-# Permisos de ejecución para el script de inicio
-RUN chmod +x /root/admin/sweb/nginx/admin/start.sh
+#    IMPORTANTE: Añadimos '/pnode/' a la ruta de origen para coincidir con tu estructura real
+#    Origen: contexto/proyectos/pnode/pokeapi -> Destino: /root/admin/base/app
+COPY ./proyectos/pnode/${PROYECTO}/ .
 
-# Configuración final
-WORKDIR /root/admin/sweb/nginx
+# 5. Copiamos el script de arranque específico para Node/Pokeapi
+#    Este script se encarga del 'npm install' y de iniciar nginx
+#    Asegúrate de que este archivo existe en tu carpeta local: dockerfiles/node/admin/start.sh
+COPY ./dockerfiles/node/admin/start.sh /root/admin/node/start.sh
+RUN chmod +x /root/admin/node/start.sh
+
+# 6. Permisos finales (por si Node necesita escribir en /var/www/html durante el build)
+RUN chown -R www-data:www-data /var/www/html \
+    && chmod -R 755 /var/www/html
+
+# 7. Configuración de arranque
 EXPOSE 80
 
-ENTRYPOINT ["./admin/start.sh"]
+# Usamos el script de Node como entrada, que instalará dependencias y levantará Nginx
+ENTRYPOINT ["/root/admin/node/start.sh"]
