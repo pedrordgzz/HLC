@@ -1,31 +1,32 @@
-FROM peedroorgzz/nginx:latest
+FROM peedroorgzz/ubbase:latest
 
 ARG PROYECTO
 
 USER root
-RUN apt update && apt install -yq --no-install-recommends \
+
+RUN apt-get update && apt-get install -yq --no-install-recommends \
     nginx \
     nodejs \
     npm \
-    build-essential
+    build-essential \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Configuración Nginx (Igual que tenías)
-RUN chown -R www-data /var/www/html
-RUN chmod -R 755 /var/www/html
-RUN mkdir -p /var/log/nginx
-RUN ln -sf /dev/stdout /var/log/nginx/access.log \
+RUN chown -R www-data:www-data /var/www/html \
+    && chmod -R 755 /var/www/html \
+    && mkdir -p /var/log/nginx \
+    && ln -sf /dev/stdout /var/log/nginx/access.log \
     && ln -sf /dev/stderr /var/log/nginx/error.log
 
-# Copiamos scripts de admin
 RUN mkdir -p /root/admin/sweb/nginx
 COPY ./dockerfiles/sweb/nginx /root/admin/sweb/nginx
 
-# --- NUEVO: Copiamos el código fuente de tu proyecto para compilarlo ---
-WORKDIR /root/admin/base/${PROYECTO}
+# --- CAMBIO AQUÍ: Usamos una carpeta fija 'app' ---
+WORKDIR /root/admin/base/app
 COPY ./proyectos/${PROYECTO}/ .
-# ----------------------------------------------------------------------
+# --------------------------------------------------
 
 RUN chmod +x /root/admin/sweb/nginx/admin/start.sh
 WORKDIR /root/admin/sweb/nginx
+EXPOSE 80
 
 ENTRYPOINT ["./admin/start.sh"]
