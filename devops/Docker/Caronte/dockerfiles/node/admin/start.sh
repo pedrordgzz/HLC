@@ -7,7 +7,7 @@ load_entrypoint_nginx(){
 }
 
 workdir(){
-    cd /root/admin/node/proyectos/pmegacrossover
+    cd /root/admin/node/proyectos/pokeapi
 }
 
 dependencias(){
