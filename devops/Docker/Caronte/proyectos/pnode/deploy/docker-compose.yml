@@ -4,6 +4,8 @@ services:
       context: ${CONTEXTO}
       dockerfile: ./dockerfiles/pokeapi/Dockerfile
     container_name: ${NOMBRE}
+    args:
+        - PROYECTO=${PROYECTO}
     ports:
       - "${PORT_WEB}:80"   
     env_file:
