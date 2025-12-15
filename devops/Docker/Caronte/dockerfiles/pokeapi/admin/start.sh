@@ -1,42 +1,49 @@
 #!/bin/bash
 set -e
 
-# Función nueva para colocar los ficheros en su sitio
-prepare_site_files(){
-    echo "--> Preparando archivos del sitio web..."
+compile_and_deploy(){
+    # Usamos la variable de entorno que definiste en el .env
+    PROJECT_DIR="/root/admin/base/$PROYECTO"
     
-    # 1. Rutas de origen (Docker standard) y destino (Ubuntu Nginx)
-    SRC="/usr/share/nginx/html"
-    DEST="/var/www/html"
+    echo "--> Iniciando compilación de $PROYECTO en $PROJECT_DIR..."
     
-    # 2. Si existe contenido en el origen (tu app compilada)
-    if [ -d "$SRC" ] && [ "$(ls -A $SRC)" ]; then
-        # Borramos el index.html 'Welcome to Nginx' que trae por defecto
-        rm -rf $DEST/*
+    if [ -d "$PROJECT_DIR" ]; then
+        cd "$PROJECT_DIR"
         
-        # Copiamos tu web al destino correcto
-        cp -r $SRC/. $DEST/
+        # 1. Instalamos dependencias y compilamos
+        echo "--> Instalando dependencias (npm install)..."
+        npm install
         
-        # Ajustamos permisos para el usuario www-data (necesario en Nginx)
-        chown -R www-data:www-data $DEST
-        chmod -R 755 $DEST
+        echo "--> Compilando proyecto (npm run build)..."
+        npm run build
         
-        echo "--> Archivos movidos y permisos configurados."
+        # 2. Movemos el resultado (dist) a donde Nginx lo lee
+        # Nota: Vite/React suelen crear la carpeta 'dist' o 'build'
+        if [ -d "dist" ]; then
+            echo "--> Desplegando a /var/www/html..."
+            rm -rf /var/www/html/*
+            cp -r dist/* /var/www/html/
+        elif [ -d "build" ]; then
+             # Por si tu proyecto crea carpeta 'build' en vez de 'dist'
+            echo "--> Desplegando a /var/www/html..."
+            rm -rf /var/www/html/*
+            cp -r build/* /var/www/html/
+        fi
+        
+        # 3. Permisos
+        chown -R www-data:www-data /var/www/html
     else
-        echo "--> ALERTA: No se encontraron archivos en $SRC"
+        echo "--> ERROR: No encuentro el código en $PROJECT_DIR"
     fi
 }
 
 load_entrypoint_nginx(){
-    # Mantenemos tu llamada original
+    # Arranca Nginx (daemon off)
     bash /root/admin/sweb/nginx/admin/start.sh
 }
 
 main(){
-    # Primero preparamos los archivos
-    prepare_site_files
-    
-    # Luego arrancamos Nginx
+    compile_and_deploy
     load_entrypoint_nginx
 }
 

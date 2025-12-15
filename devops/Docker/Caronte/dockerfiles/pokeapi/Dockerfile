@@ -1,30 +1,31 @@
-# --- ETAPA 1: CONSTRUCCIÓN (Igual que antes) ---
-FROM node:18-alpine AS builder
-ARG PROYECTO
-WORKDIR /app
-COPY ./proyectos/${PROYECTO}/package*.json ./
-RUN npm install
-COPY ./proyectos/${PROYECTO}/ .
-RUN npm run build
-
-# --- ETAPA 2: SERVIDOR ---
-FROM peedroorgzz/nginx
+FROM peedroorgzz/ubbase:latest
 
 ARG PROYECTO
+
 USER root
+RUN apt update && apt install -yq --no-install-recommends \
+    nginx \
+    nodejs \
+    npm \
+    build-essential
 
-# 1. ELIMINAMOS la página de "Welcome to Nginx" por defecto
-# Esto es crucial para asegurar que no quede basura
-RUN rm -rf /usr/share/nginx/html/*
-RUN rm -rf /var/www/html/*
+# Configuración Nginx (Igual que tenías)
+RUN chown -R www-data /var/www/html
+RUN chmod -R 755 /var/www/html
+RUN mkdir -p /var/log/nginx
+RUN ln -sf /dev/stdout /var/log/nginx/access.log \
+    && ln -sf /dev/stderr /var/log/nginx/error.log
 
-# 2. Copiamos tu aplicación compilada
-# Nota: Copiamos el contenido DE DENTRO de dist (/*) a la raíz de html
-COPY --from=builder /app/dist/ /usr/share/nginx/html/
-COPY --from=builder /app/dist/ /var/www/html/
+# Copiamos scripts de admin
+RUN mkdir -p /root/admin/sweb/nginx
+COPY ./dockerfiles/sweb/nginx /root/admin/sweb/nginx
 
-# 3. Copiamos el script de inicio
-COPY ./dockerfiles/${PROYECTO}/admin/start.sh /root/admin/base/start.sh
-RUN chmod +x /root/admin/base/start.sh
+# --- NUEVO: Copiamos el código fuente de tu proyecto para compilarlo ---
+WORKDIR /root/admin/base/${PROYECTO}
+COPY ./proyectos/${PROYECTO}/ .
+# ----------------------------------------------------------------------
 
-ENTRYPOINT [ "/root/admin/base/start.sh" ]
+RUN chmod +x /root/admin/sweb/nginx/admin/start.sh
+WORKDIR /root/admin/sweb/nginx
+
+ENTRYPOINT ["./admin/start.sh"]
