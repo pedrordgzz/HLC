@@ -1,0 +1,12 @@
+services:
+  web:
+    build:
+      context: ${CONTEXTO}
+      dockerfile: ./dockerfiles/portfolio/Dockerfile
+      args:
+        - PROYECTO=${PROYECTO}
+    container_name: ctportfolio
+    ports:
+      - "${PORT_WEB}:80" 
+    env_file:
+      - ./.env
