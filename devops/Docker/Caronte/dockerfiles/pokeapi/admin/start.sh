@@ -1,42 +1,42 @@
 #!/bin/bash
 set -e
 
-setup_project(){
-    echo "--> Configurando archivos del proyecto..."
+# Función nueva para colocar los ficheros en su sitio
+prepare_site_files(){
+    echo "--> Preparando archivos del sitio web..."
     
-    # 1. Definimos origen (donde copió el Dockerfile) y destino (donde lee Nginx)
-    # Según tu primer mensaje, copiaste el 'dist' a /usr/share/nginx/html
-    SRC_DIR="/usr/share/nginx/html"
-    DEST_DIR="/var/www/html"
-
-    # 2. Borramos la página por defecto "Welcome to Nginx" para evitar conflictos
-    if [ -f "$DEST_DIR/index.html" ]; then
-        echo "--> Eliminando index.html por defecto de Nginx..."
-        rm -f "$DEST_DIR/index.html"
+    # 1. Rutas de origen (Docker standard) y destino (Ubuntu Nginx)
+    SRC="/usr/share/nginx/html"
+    DEST="/var/www/html"
+    
+    # 2. Si existe contenido en el origen (tu app compilada)
+    if [ -d "$SRC" ] && [ "$(ls -A $SRC)" ]; then
+        # Borramos el index.html 'Welcome to Nginx' que trae por defecto
+        rm -rf $DEST/*
+        
+        # Copiamos tu web al destino correcto
+        cp -r $SRC/. $DEST/
+        
+        # Ajustamos permisos para el usuario www-data (necesario en Nginx)
+        chown -R www-data:www-data $DEST
+        chmod -R 755 $DEST
+        
+        echo "--> Archivos movidos y permisos configurados."
+    else
+        echo "--> ALERTA: No se encontraron archivos en $SRC"
     fi
-
-    # 3. Copiamos tus archivos al directorio final que usa Nginx
-    # (Usamos cp -rT para copiar el CONTENIDO, no la carpeta entera)
-    if [ -d "$SRC_DIR" ]; then
-        echo "--> Moviendo web compilada a $DEST_DIR..."
-        cp -r "$SRC_DIR/." "$DEST_DIR/"
-    fi
-
-    # 4. Ajustamos permisos para que Nginx pueda leerlos
-    chown -R www-data:www-data "$DEST_DIR"
-    chmod -R 755 "$DEST_DIR"
 }
 
 load_entrypoint_nginx(){
-    # Llama al script de la imagen base que arranca Nginx
-    # Esto debe ser lo ÚLTIMO porque ese script se queda ejecutando (daemon off)
+    # Mantenemos tu llamada original
     bash /root/admin/sweb/nginx/admin/start.sh
-    service nginx reload
-    service nginx start
 }
 
 main(){
-    setup_project
+    # Primero preparamos los archivos
+    prepare_site_files
+    
+    # Luego arrancamos Nginx
     load_entrypoint_nginx
 }
 
