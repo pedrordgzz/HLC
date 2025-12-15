@@ -5,8 +5,7 @@ services:
       dockerfile: ./dockerfiles/pokeapi/Dockerfile
     container_name: ${NOMBRE}
     ports:
-      - "80:80"   
-      - "443:443"  
+      - "${PORT_WEB}:80"   
     env_file:
       - ./.env
     image: peedroorgzz/nodejs
