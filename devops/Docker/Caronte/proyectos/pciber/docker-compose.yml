@@ -12,7 +12,6 @@ services:
     env_file:
       - ./.env
     volumes:
-      volumes:
         - ./logs:/output             # Tu reporte de auditoría
         - ./logs-nginx:/var/log/nginx # Los logs del servidor web
     networks:
