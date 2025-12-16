@@ -7,6 +7,7 @@ load_entrypoint_node(){
 }
 
 dependencias(){
+  npm install
   npm run build
   rm -rf /var/www/html/*
         if [ -d "dist" ]; then
