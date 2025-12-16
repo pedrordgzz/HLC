@@ -7,7 +7,7 @@ config_nginx() {
 }
 
 load_entrypoint_base(){
-    bash /app/start.sh
+    bash /root/admin/ciber/start.sh
 }
 
 main(){
