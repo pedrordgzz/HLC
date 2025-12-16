@@ -13,8 +13,8 @@ services:
       - ./.env
     volumes:
       volumes:
-      - ./logs:/output             # Tu reporte de auditoría
-      - ./logs-nginx:/var/log/nginx # Los logs del servidor web
+        - ./logs:/output             # Tu reporte de auditoría
+        - ./logs-nginx:/var/log/nginx # Los logs del servidor web
     networks:
       netcaronte:
           ipv4_address: ${IP}
