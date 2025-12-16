@@ -4,10 +4,10 @@ ARG PROYECTO
 
 USER root
 
-RUN apt-get update && apt-get install -yq --no-install-recommends \
-    nodejs \
-    npm \
-    && apt-get clean && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y curl \
+    && curl -fsSL https://deb.nodesource.com/setup_current.x | bash - \
+    && apt-get install -y nodejs \
+    && apt-get clean && rm -rf /var/lib/apt/lists/* 
     
 WORKDIR /root/admin/base/app
 COPY ./proyectos/${PROYECTO}/ .
