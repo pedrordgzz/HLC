@@ -4,8 +4,11 @@ ARG PROYECTO
 
 USER root
 
-RUN apt-get update && apt-get install -y nodejs npm
-
+RUN apt-get update && apt-get install -yq --no-install-recommends \
+    nodejs \
+    npm \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
+    
 WORKDIR /root/admin/base/app
 COPY ./proyectos/${PROYECTO}/ .
 
