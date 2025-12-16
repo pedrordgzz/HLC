@@ -12,7 +12,7 @@ services:
     env_file:
       - ./.env
     volumes:
-      - ./logs/auditoria.logs:/output/auditoria_completa.txt
+      - ./logs:/output
     networks:
       netcaronte:
           ipv4_address: ${IP}
