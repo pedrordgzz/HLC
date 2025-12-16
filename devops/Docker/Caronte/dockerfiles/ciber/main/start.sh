@@ -1,7 +1,4 @@
 #!/bin/bash
-
-REPORT_FILE="/output/auditoria_completa.txt"
-
 echo "   INFORME DE CIBERSEGURIDAD AUTOMATIZADO" >> $REPORT_FILE
 echo "   Fecha: $(date)" >> $REPORT_FILE
 
