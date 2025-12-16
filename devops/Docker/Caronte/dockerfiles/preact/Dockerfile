@@ -1,15 +1,12 @@
-FROM peedroorgzz/nginx
+FROM peedroorgzz/nodjs
 
-RUN apt install -yq --no-install-recommends \
-    nodejs \
-    npm
+ARG PROYECTO
 
-RUN mkdir -p /root/admin/node
-RUN mkdir -p /root/admin/node/proyectos/${PROYECTO}
-WORKDIR /root/admin/node
-COPY ./proyectos/${PROYECTO}/ /root/admin/node/proyectos/${PROYECTO}
+RUN mkdir -p /root/admin/pokeapi
+WORKDIR /root/admin/pokeapi
+COPY ./dockerfiles/pokeapi/admin/start.sh .
+RUN chmod +x ./start.sh
 
-COPY ./dockerfiles/node/admin/start.sh .
-RUN chmod +x /root/admin/node/start.sh
+EXPOSE 3000 
 
-ENTRYPOINT [ "./start.sh" ]
+ENTRYPOINT ["./start.sh"]
