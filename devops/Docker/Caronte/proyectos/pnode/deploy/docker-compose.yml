@@ -2,7 +2,7 @@ services:
   web:
     build:
       context: ${CONTEXTO}
-      dockerfile: ./dockerfiles/pokeapi/Dockerfile
+      dockerfile: ./dockerfiles/pnode/Dockerfile
       args:
         - PROYECTO=${PROYECTO}
     container_name: ${NOMBRE}
