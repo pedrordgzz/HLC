@@ -3,9 +3,6 @@
 set -e 
 
 load_entrypoint_node(){
-    # Si la imagen base tiene su propio script de inicio, lo ejecutamos.
-    # Si ese script se queda pillado, habría que ponerle un '&' al final, 
-    # pero asumimos que es configuración.
     if [ -f /root/admin/node/start.sh ]; then
         bash /root/admin/node/start.sh
     fi
@@ -18,30 +15,57 @@ dependencias(){
   echo "--- 2. Construyendo build para Nginx ---"
   npm run build
   
-  # Copiar los ficheros estáticos a la carpeta de Nginx
+  echo "--- 3. Copiando archivos a Nginx ---"
+  # Limpiamos destino
   rm -rf /var/www/html/*
+  
+  # Verificamos qué carpeta se creó (dist para Vite, build para CRA)
   if [ -d "dist" ]; then
+      echo "Detectada carpeta 'dist'"
       cp -r dist/. /var/www/html/
   elif [ -d "build" ]; then
-       cp -r build/. /var/www/html/
+      echo "Detectada carpeta 'build'"
+      cp -r build/. /var/www/html/
+  else
+      echo "PELIGRO: No se encontró carpeta 'dist' ni 'build'. Nginx servirá vacío."
   fi
+  
   chown -R www-data:www-data /var/www/html
 }
 
+# --- NUEVA FUNCIÓN ---
+configurar_nginx(){
+    echo "--- Configurando Nginx para React ---"
+    # Borramos la config por defecto para evitar conflictos
+    rm -f /etc/nginx/sites-enabled/default
+    
+    # Creamos una configuración básica que apunte a /var/www/html
+    # y maneje el enrutado de React (try_files)
+    cat > /etc/nginx/conf.d/default.conf <<EOF
+server {
+    listen 80;
+    server_name localhost;
+    root /var/www/html;
+    index index.html;
+
+    location / {
+        try_files \$uri \$uri/ /index.html;
+    }
+}
+EOF
+}
+
 start_node_dev(){
-    echo "--- 3. Iniciando Node (npm run dev) en segundo plano ---"
-    # IMPORTANTE: El símbolo '&' al final manda el proceso al fondo.
-    # Esto permite que el script continúe y lance Nginx.
+    echo "--- 4. Iniciando Node (Background) ---"
     npm run dev &
 }
 
 nginxreload(){
-    echo "--- 4. Iniciando Nginx en primer plano ---"
+    echo "--- 5. Iniciando Nginx ---"
     if nginx -t; then
-       # Nginx se queda en 'daemon off' para mantener el contenedor vivo
        nginx -g 'daemon off;'
     else
-        echo "ERROR: Configuración Nginx inválida" >> /root/logs/informe_pokeapi.log
+        echo "ERROR: Configuración Nginx inválida"
         exit 1
     fi
 }
@@ -49,8 +73,9 @@ nginxreload(){
 main(){
     load_entrypoint_node
     dependencias
-    start_node_dev  # <--- Aquí lanzamos Node
-    nginxreload     # <--- Y aquí Nginx (que mantendrá vivo el contenedor)
+    configurar_nginx  # <--- Paso añadido
+    start_node_dev
+    nginxreload
 }
 
 main
