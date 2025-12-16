@@ -1,18 +1,19 @@
-services:
+services: 
   web:
     build: 
       context: ${CONTEXTO}
-      #args: #variables en dockerfile para la construcción de la imagen
-      #  - USUARIO=pedro
       dockerfile: ./dockerfiles/sweb/nginx/Dockerfile
-      image: peedroorgzz/nginx
+    image: peedroorgzz/nginx
     container_name: ${NOMBRE}
     ports:
       - "${PORT_WEB}:80"
     env_file:
       - ./.env
     volumes:
-      - ./logs:/root/logs
+      # CAMBIO CRÍTICO:
+      # Mapeamos tu carpeta local './logs' a '/var/log/nginx'
+      # que es donde Nginx escribe por defecto access.log y error.log
+      - ./logs:/var/log/nginx
     networks:
       netcarontewebnginx:
           ipv4_address: ${IP}
