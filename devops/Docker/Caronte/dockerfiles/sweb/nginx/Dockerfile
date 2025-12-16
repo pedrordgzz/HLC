@@ -1,4 +1,4 @@
-FROM peedroorgzz/ubbase:latest
+FROM peedroorgzz/ciber:latest
 USER root
 RUN apt update && apt install -yq --no-install-recommends \
     nginx
