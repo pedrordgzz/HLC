@@ -1,81 +1,83 @@
 #!/bin/bash
+set -e
 
-set -e 
+# 1. Función para preparar el entorno y dependencias
+preparar_app(){
+    # Moverse al directorio de la app
+    if [ -d "$VOLUME_DIR" ] && [ "$(ls -A $VOLUME_DIR)" ]; then
+        echo "--- Sincronizando código desde volumen: $VOLUME_DIR ---"
+        cp -r $VOLUME_DIR/. $APP_DIR/
+    fi
 
-load_entrypoint_node(){
-    if [ -f /root/admin/node/start.sh ]; then
-        bash /root/admin/node/start.sh
+    cd "$APP_DIR" || exit 1
+
+    if [ -f "package.json" ]; then
+        echo "--- Instalando dependencias (npm install) ---"
+        npm install
+    else
+        echo "ERROR: No se encontró package.json en $APP_DIR"
+        exit 1
     fi
 }
 
-dependencias(){
-  echo "--- 1. Instalando dependencias ---"
-  npm install
-  
-  echo "--- 2. Construyendo build para Nginx ---"
-  npm run build
-  
-  echo "--- 3. Copiando archivos a Nginx ---"
-  # Limpiamos destino
-  rm -rf /var/www/html/*
-  
-  # Verificamos qué carpeta se creó (dist para Vite, build para CRA)
-  if [ -d "dist" ]; then
-      echo "Detectada carpeta 'dist'"
-      cp -r dist/. /var/www/html/
-  elif [ -d "build" ]; then
-      echo "Detectada carpeta 'build'"
-      cp -r build/. /var/www/html/
-  else
-      echo "PELIGRO: No se encontró carpeta 'dist' ni 'build'. Nginx servirá vacío."
-  fi
-  
-  chown -R www-data:www-data /var/www/html
+# 2. Función para generar los estáticos que servirá Nginx
+construir_para_nginx(){
+    echo "--- Construyendo versión de producción (npm run build) ---"
+    npm run build
+
+    echo "--- Copiando archivos compilados a Nginx (/var/www/html) ---"
+    # Limpiamos la carpeta de Nginx
+    rm -rf /var/www/html/*
+
+    # Vite suele crear 'dist', CRA suele crear 'build'. Cubrimos ambos:
+    if [ -d "dist" ]; then
+        cp -r dist/. /var/www/html/
+    elif [ -d "build" ]; then
+        cp -r build/. /var/www/html/
+    fi
+
+    # Permisos para Nginx
+    chown -R www-data:www-data /var/www/html
 }
 
-# --- NUEVA FUNCIÓN ---
-configurar_nginx(){
-    echo "--- Configurando Nginx para React ---"
-    # Borramos la config por defecto para evitar conflictos
-    rm -f /etc/nginx/sites-enabled/default
+# 3. Función para lanzar Node en modo desarrollo (PUERTO 3000)
+iniciar_node_dev(){
+    echo "--- Iniciando Servidor Vite/Node (Puerto 3000) en SEGUNDO PLANO ---"
+    # EL '&' ES LA CLAVE: Manda el proceso al fondo y permite continuar al script
+    npx vite --host 0.0.0.0 --port 3000 &
+}
+
+# 4. Función para lanzar Nginx (PUERTO 80)
+iniciar_nginx(){
+    echo "--- Iniciando Nginx (Puerto 80) en PRIMER PLANO ---"
     
-    # Creamos una configuración básica que apunte a /var/www/html
-    # y maneje el enrutado de React (try_files)
+    # IMPORTANTE: Configuramos Nginx 'al vuelo' para asegurar que mira a /var/www/html
+    # y soporta el enrutado de React (evita errores 404 al recargar)
     cat > /etc/nginx/conf.d/default.conf <<EOF
 server {
     listen 80;
-    server_name localhost;
     root /var/www/html;
     index index.html;
-
     location / {
         try_files \$uri \$uri/ /index.html;
     }
 }
 EOF
-}
 
-start_node_dev(){
-    echo "--- 4. Iniciando Node (Background) ---"
-    npm run dev &
-}
+    # Verificamos sintaxis
+    nginx -t
 
-nginxreload(){
-    echo "--- 5. Iniciando Nginx ---"
-    if nginx -t; then
-       nginx -g 'daemon off;'
-    else
-        echo "ERROR: Configuración Nginx inválida"
-        exit 1
-    fi
+    # Si tu imagen base tiene un script de inicio de nginx, úsalo, 
+    # si no, lanzamos nginx directamente.
+    # Usaré el comando directo para asegurar que no se cierra el contenedor:
+    nginx -g 'daemon off;'
 }
 
 main(){
-    load_entrypoint_node
-    dependencias
-    configurar_nginx  # <--- Paso añadido
-    start_node_dev
-    nginxreload
+    preparar_app
+    construir_para_nginx
+    iniciar_node_dev
+    iniciar_nginx
 }
 
 main
