@@ -5,8 +5,8 @@ ARG PROYECTO
 USER root
 
 RUN apt-get update && apt-get install -yq --no-install-recommends \
-    nodejs \
-    npm 
+    curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
+    && apt-get install -yq --no-install-recommends nodejs
 
 WORKDIR /root/admin/base/app
 COPY ./proyectos/${PROYECTO}/ .
