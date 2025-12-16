@@ -8,5 +8,3 @@ nmap -Pn -sV ubbase >> $REPORT_FILE
 echo "   AUDITORÍA FINALIZADA" >> $REPORT_FILE
 
 echo "[OK] Reporte generado en $REPORT_FILE"
-
-tail -f /dev/null
