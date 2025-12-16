@@ -1,4 +1,4 @@
-FROM pedrordgzz/ubbase:latest
+FROM peedroordgzz/ubbase:latest
 
 # Intalo nmap
 RUN apt-get update && \
