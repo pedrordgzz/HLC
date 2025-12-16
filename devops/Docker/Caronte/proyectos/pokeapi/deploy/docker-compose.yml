@@ -10,7 +10,8 @@ services:
     env_file:
       - ./.env
     volumes:
-      - ./logs:/root/logs      
+      - ./logs:/root/logs 
+      - ../:/root/admin/pokeapi     
     networks:
       netnodeclase:
         ipv4_address: ${IP}
