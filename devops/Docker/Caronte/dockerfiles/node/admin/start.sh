@@ -18,9 +18,12 @@ deploy_app(){
         exit 1
     fi
 }
-
+load_entrypoint_base(){
+    bash /root/admin/sweb/nginx/start.sh
+}
 main(){
     deploy_app
+    load_entrypoint_base
 }
 
 main
