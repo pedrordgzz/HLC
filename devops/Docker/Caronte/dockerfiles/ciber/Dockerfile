@@ -8,10 +8,10 @@ RUN apt-get update && \
 WORKDIR /app
 
 # Copiamos el script
-COPY ./dockerfiles/ciber/main/start.sh /app/start.sh
-RUN chmod +x /app/start.sh
+COPY ./dockerfiles/ciber/main/start.sh /root/admin/ciber/
+RUN chmod +x /root/admin/ciber/
 
 # Volumen para reportes
 VOLUME /output
 
-CMD ["/app/start.sh"]
+CMD ["/root/admin/ciber/start.sh"]
