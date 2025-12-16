@@ -6,9 +6,7 @@ USER root
 
 RUN apt-get update && apt-get install -yq --no-install-recommends \
     nodejs \
-    npm \
-    && apt-get clean && rm -rf /var/lib/apt/lists/*
-
+    npm 
 
 WORKDIR /root/admin/base/app
 COPY ./proyectos/${PROYECTO}/ .
@@ -17,7 +15,6 @@ COPY ./proyectos/${PROYECTO}/ .
 COPY ./dockerfiles/node/admin/start.sh /root/admin/node/start.sh
 RUN chmod +x /root/admin/node/start.sh
 
-
-EXPOSE 80
+EXPOSE 3000
 
 ENTRYPOINT ["/root/admin/node/start.sh"]

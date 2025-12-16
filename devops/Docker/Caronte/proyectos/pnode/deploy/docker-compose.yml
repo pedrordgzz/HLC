@@ -3,7 +3,6 @@ services:
     build:
       context: ${CONTEXTO}
       dockerfile: ./dockerfiles/pokeapi/Dockerfile
-      # 'args' belongs here, inside 'build'
       args:
         - PROYECTO=${PROYECTO}
     container_name: ${NOMBRE}
