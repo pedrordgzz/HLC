@@ -4,17 +4,16 @@ ARG PROYECTO
 
 USER root
 
-# 1. Instalar utilidades básicas
-RUN apt-get update && apt-get install -y curl ca-certificates gnupg
-
-# 2. Descargar e instalar Node.js v22 (La versión que piden tus logs)
-RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash -
-RUN apt-get install -y nodejs
+# Combine updates, setup, and install in one RUN block to ensure freshness
+RUN apt-get update && \
+    apt-get install -y curl ca-certificates gnupg && \
+    curl -fsSL https://deb.nodesource.com/setup_22.x | bash - && \
+    apt-get install -y nodejs && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
     
 WORKDIR /root/admin/base/app
 COPY ./proyectos/${PROYECTO}/ .
-
-
 COPY ./dockerfiles/node/admin/start.sh /root/admin/node/start.sh
 RUN chmod +x /root/admin/node/start.sh
 
