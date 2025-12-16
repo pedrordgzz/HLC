@@ -2,7 +2,7 @@
 
 set -e 
 
-load_entrypoint_nginx(){
+load_entrypoint_node(){
     bash /root/admin/node/start.sh
 }
 
@@ -30,7 +30,7 @@ nginxreload(){
 
 
 main(){
-    load_entrypoint_nginx
+    load_entrypoint_node
     dependencias
     nginxreload
 
