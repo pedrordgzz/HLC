@@ -5,7 +5,7 @@ services:
       dockerfile: ./dockerfiles/preact/Dockerfile
     container_name: ctr_pokeapi
     ports:
-      - "3001:${PORT_NODE}"   
+      - "3000:${PORT_NODE}"   
       - "${PORT_WEB}:80"
     env_file:
       - ./.env
