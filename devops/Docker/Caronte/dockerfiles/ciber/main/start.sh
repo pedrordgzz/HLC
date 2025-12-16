@@ -18,3 +18,5 @@ main(){
  load_entrypoint_base
  auditoria
 }
+
+main
