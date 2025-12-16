@@ -12,7 +12,9 @@ services:
     env_file:
       - ./.env
     volumes:
-      - ./logs:/output
+      volumes:
+      - ./logs:/output             # Tu reporte de auditoría
+      - ./logs-nginx:/var/log/nginx # Los logs del servidor web
     networks:
       netcaronte:
           ipv4_address: ${IP}
