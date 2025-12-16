@@ -12,7 +12,7 @@ deploy_app(){
 
     if [ -f "package.json" ]; then
         npm install      
-        npm run dev --host 0.0.0.0 --port 3000 
+        npx vite --host 0.0.0.0 --port 3000 
     else
         echo "ERROR: No se encontró package.json en $APP_DIR"
         exit 1
