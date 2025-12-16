@@ -1,0 +1,25 @@
+services:
+  web:
+    build: 
+      context: ${CONTEXTO}
+      #args: #variables en dockerfile para la construcción de la imagen
+      #  - USUARIO=pedro
+      dockerfile: ./dockerfiles/ciber/Dockerfile
+    image: peedroorgzz/ciber
+    container_name: ${NOMBRE}
+    ports:
+      - "${PORT_SSH}:${PORT_SSH}"
+    env_file:
+      - ./.env
+    volumes:
+      - ./logs/auditoria.logs:/output/auditoria_completa.txt
+    networks:
+      netcaronte:
+          ipv4_address: ${IP}
+
+networks:
+  netcaronte:
+    ipam:
+      driver: default
+      config:
+        - subnet: ${SUBNET}
