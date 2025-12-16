@@ -1,4 +1,4 @@
-FROM peedroorgzz/nodjs
+FROM peedroorgzz/nodejs
 
 ARG PROYECTO
 
