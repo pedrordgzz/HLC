@@ -9,4 +9,4 @@ RUN chmod +x ./start.sh
 
 EXPOSE 3000 
 
-ENTRYPOINT ["./start.sh"]
+ENTRYPOINT ["bash /root/admin/pokeapi/start.sh"]
