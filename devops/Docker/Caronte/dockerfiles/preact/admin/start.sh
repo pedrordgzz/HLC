@@ -1,17 +1,12 @@
 #!/bin/bash
 set -e
-preparar_codigo(){
-    echo "--- Ejecutando script de preparación de Node (copia de archivos) ---"
-    # Lo ejecutamos SIN '&' porque necesitamos que termine de copiar antes de compilar
+load_entrypoint_node(){
     bash /root/admin/node/start.sh
 }
 
 construir_para_nginx(){
-    cd "$APP_DIR" # Aseguramos estar en la carpeta correcta
-    echo "--- Construyendo versión de producción (npm run build) ---"
+    cd "$APP_DIR"
     npm run build
-
-    echo "--- Copiando a Nginx ---"
     rm -rf /var/www/html/*
     
     if [ -d "dist" ]; then
@@ -22,9 +17,13 @@ construir_para_nginx(){
     
     chown -R www-data:www-data /var/www/html
 }
+iniciar_node(){
+    cd "$APP_DIR"
+    npx vite --host 0.0.0.0 --port 3000 &
 
+
+}
 iniciar_nginx(){
-    echo "--- Iniciando Nginx ---"
     nginx -g 'daemon off;'
 }
 
