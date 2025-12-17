@@ -23,10 +23,16 @@ instalar_dependencias(){
         echo "No se encontró package.json. Saltando instalación."
     fi
 }
+iniciar_node(){
+    cd "$APP_DIR"
+    npx vite --host 0.0.0.0 --port 3000 &
 
+
+}
 main(){
     deploy_app
     instalar_dependencias
+    iniciar_node
 }
 
 main

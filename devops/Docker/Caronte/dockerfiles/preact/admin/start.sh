@@ -17,12 +17,7 @@ construir_para_nginx(){
     
     chown -R www-data:www-data /var/www/html
 }
-iniciar_node(){
-    cd "$APP_DIR"
-    npx vite --host 0.0.0.0 --port 3000 &
 
-
-}
 iniciar_nginx(){
     nginx -g 'daemon off;'
 }
