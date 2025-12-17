@@ -19,7 +19,7 @@ deploy_app(){
     fi
 }
 load_entrypoint_base(){
-    bash /root/admin/sweb/nginx/start.sh
+    bash /root/admin/sweb/nginx/admin/start.sh
 }
 main(){
      load_entrypoint_base
