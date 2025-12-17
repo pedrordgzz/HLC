@@ -1,6 +1,10 @@
 #!/bin/bash
 set -e
 
+load_entrypoint_node(){
+    bash /root/admin/sweb/node/start.sh
+}
+
 # 1. Función para preparar el entorno y dependencias
 preparar_app(){
     # Moverse al directorio de la app
@@ -40,12 +44,7 @@ construir_para_nginx(){
     chown -R www-data:www-data /var/www/html
 }
 
-# 3. Función para lanzar Node en modo desarrollo (PUERTO 3000)
-iniciar_node_dev(){
-    echo "--- Iniciando Servidor Vite/Node (Puerto 3000) en SEGUNDO PLANO ---"
-    # EL '&' ES LA CLAVE: Manda el proceso al fondo y permite continuar al script
-    npx vite --host 0.0.0.0 --port 3000 &
-}
+
 
 # 4. Función para lanzar Nginx (PUERTO 80)
 iniciar_nginx(){
@@ -60,9 +59,9 @@ iniciar_nginx(){
 }
 
 main(){
+    load_entrypoint_node
     preparar_app
     construir_para_nginx
-    iniciar_node_dev
     iniciar_nginx
 }
 
