@@ -22,8 +22,8 @@ load_entrypoint_base(){
     bash /root/admin/sweb/nginx/start.sh
 }
 main(){
+     load_entrypoint_base
     deploy_app
-    load_entrypoint_base
 }
 
 main
