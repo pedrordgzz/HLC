@@ -2,7 +2,7 @@
 set -e
 
 load_entrypoint_node(){
-    bash /root/admin/sweb/node/start.sh
+    bash /root/admin/node/start.sh
 }
 
 # 1. Función para preparar el entorno y dependencias
