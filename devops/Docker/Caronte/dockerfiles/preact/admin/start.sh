@@ -28,10 +28,9 @@ iniciar_nginx(){
 }
 
 main(){
-    load_entrypoint_node      # 1. Copia los archivos
-    construir_para_nginx # 2. Compila los archivos copiados
+    load_entrypoint_node     
+    construir_para_nginx 
     iniciar_node
-    iniciar_nginx        # 3. Sirve la web
+    iniciar_nginx      
 }
-
 main

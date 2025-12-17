@@ -10,8 +10,6 @@ deploy_app(){
         echo "Copiando archivos"
         cp -rf "$VOLUME_DIR/." "$APP_DIR/"
         echo "Copia finalizada."
-    else
-        echo "Volumen vacío. Usando código preexistente en la imagen."
     fi
 
     cd "$APP_DIR"
@@ -20,7 +18,6 @@ deploy_app(){
 instalar_dependencias(){ 
     if [ -f "package.json" ]; then
         npm install
-        
         echo "Instalación completada."
     else
         echo "No se encontró package.json. Saltando instalación."
