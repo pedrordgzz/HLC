@@ -6,7 +6,7 @@ auditoria(){
     echo "[+] Iniciando Fase 1: Mapeo de Puertos (Nmap)..."
 
     echo -e "\n--- RESULTADOS NMAP (Localhost) ---" >> "$REPORT_FILE"
-    nmap -Pn -sV http://194.163.138.9/ >> "$REPORT_FILE"
+    nmap -Pn -sV http://127.0.0.1/ >> "$REPORT_FILE"
     
     echo "   AUDITORÍA FINALIZADA" >> "$REPORT_FILE"
     echo "[OK] Reporte generado en $REPORT_FILE"
