@@ -49,21 +49,7 @@ iniciar_node_dev(){
 
 # 4. Función para lanzar Nginx (PUERTO 80)
 iniciar_nginx(){
-    echo "--- Iniciando Nginx (Puerto 80) en PRIMER PLANO ---"
     
-    # IMPORTANTE: Configuramos Nginx 'al vuelo' para asegurar que mira a /var/www/html
-    # y soporta el enrutado de React (evita errores 404 al recargar)
-    cat > /etc/nginx/conf.d/default.conf <<EOF
-server {
-    listen 80;
-    root /var/www/html;
-    index index.html;
-    location / {
-        try_files \$uri \$uri/ /index.html;
-    }
-}
-EOF
-
     # Verificamos sintaxis
     nginx -t
 
