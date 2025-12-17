@@ -1,3 +1,5 @@
+#!/bin/bash
+set -e
 preparar_codigo(){
     echo "--- Ejecutando script de preparación de Node (copia de archivos) ---"
     # Lo ejecutamos SIN '&' porque necesitamos que termine de copiar antes de compilar
