@@ -10,14 +10,8 @@ deploy_app(){
 
     cd "$APP_DIR"
 
-    if [ -f "package.json" ]; then
-        npm install      
-        npx vite --host 0.0.0.0 --port 3000 &
-    else
-        echo "ERROR: No se encontró package.json en $APP_DIR"
-        exit 1
-    fi
 }
+
 load_entrypoint_base(){
     bash /root/admin/sweb/nginx/admin/start.sh
 }

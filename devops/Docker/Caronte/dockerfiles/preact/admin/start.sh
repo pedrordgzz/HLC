@@ -7,21 +7,7 @@ load_entrypoint_node(){
 
 # 1. Función para preparar el entorno y dependencias
 preparar_app(){
-    # Moverse al directorio de la app
-    if [ -d "$VOLUME_DIR" ] && [ "$(ls -A $VOLUME_DIR)" ]; then
-        echo "--- Sincronizando código desde volumen: $VOLUME_DIR ---"
-        cp -r $VOLUME_DIR/. $APP_DIR/
-    fi
-
-    cd "$APP_DIR" || exit 1
-
-    if [ -f "package.json" ]; then
-        echo "--- Instalando dependencias (npm install) ---"
-        npm install
-    else
-        echo "ERROR: No se encontró package.json en $APP_DIR"
-        exit 1
-    fi
+        npx vite --host 0.0.0.0 --port 3000 &
 }
 
 # 2. Función para generar los estáticos que servirá Nginx
