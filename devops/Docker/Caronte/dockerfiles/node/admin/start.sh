@@ -8,9 +8,11 @@ deploy_app(){
         echo "Código existente en el volumen: $VOLUME_DIR"
         mkdir -p "$APP_DIR"
         echo "Copiando archivos"
+        rm -rf "$APP_DIR/node_modules"
         cp -rf "$VOLUME_DIR/." "$APP_DIR/"
         echo "Copia finalizada."
     fi
+    
 
     cd "$APP_DIR"
 }
@@ -18,6 +20,7 @@ deploy_app(){
 instalar_dependencias(){ 
     if [ -f "package.json" ]; then
         npm install
+        chmod -R +x node_modules/.bin
         echo "Instalación completada."
     else
         echo "No se encontró package.json. Saltando instalación."
