@@ -3,8 +3,8 @@ FROM peedroorgzz/nodejs
 ARG PROYECTO
 
 # Creamos la carpeta del proyecto
-RUN mkdir -p /root/admin/pokeapi/
-WORKDIR /root/admin/pokeapi
+RUN mkdir -p /root/admin/${PROYECTO}/
+WORKDIR /root/admin/${PROYECTO}
 
 # --- CAMBIO IMPORTANTE ---
 # Copiamos el start.sh a /root/ (un nivel más arriba) 
