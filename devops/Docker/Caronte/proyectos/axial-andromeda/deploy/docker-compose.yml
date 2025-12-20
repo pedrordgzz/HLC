@@ -1,0 +1,24 @@
+services:
+  web:
+    build:
+      context: ${CONTEXTO}
+      dockerfile: ./dockerfiles/preact/Dockerfile
+    container_name: ctr_web
+    ports:
+      - "3000:${PORT_NODE}"   
+      - "${PORT_WEB}:80"
+    env_file:
+      - ./.env
+    volumes:
+      - ./logs:/root/logs 
+      - ../:/root/admin/pokeapi     
+    networks:
+      netnodeclase:
+        ipv4_address: ${IP}
+networks:
+  netnodeclase:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: ${SUBNET}
