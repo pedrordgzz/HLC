@@ -15,6 +15,8 @@ services:
     networks:
       netnodeclase:
         ipv4_address: ${IP}
+      netcarontewebnginx:
+
 networks:
   netnodeclase:
     driver: bridge
@@ -22,3 +24,5 @@ networks:
       driver: default
       config:
         - subnet: ${SUBNET}
+  netcarontewebnginx:
+    external: true
