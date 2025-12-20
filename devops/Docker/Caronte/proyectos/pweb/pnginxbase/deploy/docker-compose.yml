@@ -13,7 +13,6 @@ services:
       - ./.env
     volumes:
       - ./logs:/root/logs
-      - ./conf.d:/etc/nginx/conf.d
     networks:
       netcarontewebnginx:
           ipv4_address: ${IP}
