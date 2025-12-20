@@ -23,7 +23,7 @@ iniciar_nginx(){
 }
 
 main(){
-    load_entrypoint_node     
+     
     construir_para_nginx 
     iniciar_nginx      
 }
