@@ -1,0 +1,44 @@
+:root {
+    --font-main: 'Outfit', sans-serif;
+
+    /* One Piece Universe Theme */
+    --op-gold: #D4AF37;
+    --op-blue: #001F3F;
+    --op-red: #C41E3A;
+    --op-white: #f5f5f5;
+
+    /* Zoro Theme */
+    --zoro-green: #00fa9a;
+    /* Bright neon green for accents */
+    --zoro-dark-green: #0b3d26;
+    --zoro-black: #050505;
+    --zoro-gray: #1a1a1a;
+
+    --bg-primary: #0a0a0a;
+    --text-primary: #ffffff;
+
+    color-scheme: dark;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: var(--font-main);
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    overflow-x: hidden;
+}
+
+/* Utilities */
+.text-gradient-gold {
+    background: linear-gradient(to right, #FDB931, #D4AF37);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.glass-panel {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+}

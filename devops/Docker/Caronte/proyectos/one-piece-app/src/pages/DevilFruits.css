@@ -1,0 +1,61 @@
+.fruits-page {
+    padding: 4rem 2rem;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.fruits-title {
+    text-align: center;
+    font-size: 3.5rem;
+    margin-bottom: 4rem;
+    letter-spacing: 2px;
+}
+
+.fruits-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 2.5rem;
+}
+
+.fruit-card {
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    background: rgba(25, 25, 25, 0.8);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.fruit-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1.5rem;
+}
+
+.fruit-type {
+    font-size: 0.8rem;
+    padding: 4px 10px;
+    border: 1px solid;
+    border-radius: 20px;
+    text-transform: uppercase;
+    font-weight: bold;
+}
+
+.fruit-card h2 {
+    font-size: 1.8rem;
+    margin: 0 0 0.5rem 0;
+    color: white;
+}
+
+.fruit-user {
+    color: var(--op-gold);
+    font-style: italic;
+    margin-bottom: 1rem;
+    font-size: 0.95rem;
+}
+
+.fruit-card p {
+    color: rgba(255, 255, 255, 0.7);
+    line-height: 1.6;
+    font-size: 1rem;
+}
