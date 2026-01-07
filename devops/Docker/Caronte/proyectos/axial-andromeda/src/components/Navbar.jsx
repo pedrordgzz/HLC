@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import Logo from './Logo';
 
 const Navbar = () => {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -21,9 +22,9 @@ const Navbar = () => {
             zIndex: 1000,
             borderBottom: '1px solid rgba(255, 255, 255, 0.1)'
         }}>
-            <div className="logo" style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--primary)' }}>
-                ASIR<span style={{ color: 'white' }}>.DEV</span>
-            </div>
+            <a href="#" style={{ textDecoration: 'none' }}>
+                <Logo />
+            </a>
 
             {/* Desktop Menu */}
             <div className="nav-links desktop-only" style={{ display: 'flex', gap: '2rem', alignItems: 'center' }}>
