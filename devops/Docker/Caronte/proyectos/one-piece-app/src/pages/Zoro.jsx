@@ -1,146 +1,211 @@
-import { motion } from 'framer-motion';
-import { Sword, Wind, Zap, Skull, Map } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Sword, Wind, Zap, Skull, Map, ChevronLeft, ChevronRight } from 'lucide-react';
+import { useState, useEffect } from 'react';
 import './Zoro.css';
 
-export const Zoro = () => {
+const Carousel = () => {
+    const images = [
+        { id: 1, src: '/images/zoro1.jpg', alt: 'Zoro Battle Stance' },
+        { id: 2, src: '/images/zoro2.jpg', alt: 'Zoro Training' },
+        { id: 3, src: '/images/zoro3.jpg', alt: 'Zoro Drinking' },
+        { id: 4, src: '/images/zoro4.jpg', alt: 'Zoro Sleeping' }
+    ];
+
+    const [currentIndex, setCurrentIndex] = useState(0);
+
+    const nextSlide = () => {
+        setCurrentIndex((prev) => (prev + 1) % images.length);
+    };
+
+    const prevSlide = () => {
+        setCurrentIndex((prev) => (prev - 1 + images.length) % images.length);
+    };
+
     return (
-        <div className="zoro-page">
-            <div className="zoro-hero">
-                <motion.div
-                    className="zoro-content"
-                    initial={{ x: -50, opacity: 0 }}
-                    animate={{ x: 0, opacity: 1 }}
-                    transition={{ duration: 0.8 }}
-                >
-                    <div className="role-tag">CAZADOR DE PIRATAS</div>
-                    <h1 className="zoro-title">RORONOA<br /><span className="highlight-green">ZORO</span></h1>
-
-                    <div className="stats-grid">
-                        <div className="stat-item">
-                            <Sword className="stat-icon" />
-                            <span>Usuario del Santoryu</span>
-                        </div>
-                        <div className="stat-item">
-                            <Wind className="stat-icon" />
-                            <span>Recompensa: 1,111,000,000</span>
-                        </div>
-                        <div className="stat-item">
-                            <Zap className="stat-icon" />
-                            <span>Haki del Conquistador</span>
-                        </div>
-                    </div>
-                </motion.div>
-            </div>
-
-            <div className="content-grid">
-                <div className="technique-column">
-                    <SectionTitle title="Las Tres Espadas" icon={Sword} />
-                    <div className="swords-display glass-panel">
-                        <SwordItem
-                            name="Wado Ichimonji"
-                            desc="La espada de Kuina. Espada de Gran Grado."
-                            grade="Gran Grado"
-                        />
-                        <SwordItem
-                            name="Sandai Kitetsu"
-                            desc="Una espada maldita. Afilada pero sedienta de sangre."
-                            grade="Grado"
-                        />
-                        <SwordItem
-                            name="Enma"
-                            desc="La espada que cortó a Kaido. Extrae Haki."
-                            grade="Gran Grado"
-                        />
-                    </div>
-
-                    <SectionTitle title="Santoryu Ogi" icon={Zap} />
-                    <div className="technique-list">
-                        <TechniqueCard
-                            name="Ichidai San Zen Daisen Sekai"
-                            translation="Gran Hazaña del Dragón: Tres Mil Mundos"
-                            desc="Una técnica secreta mejorada usada para cortar a Pica."
-                        />
-                        <TechniqueCard
-                            name="Ashura: Bakkei Moja no Tawamure"
-                            translation="Asura: Juego de los Muertos"
-                            desc="Usa Haki del Conquistador para infligir una cicatriz duradera a Kaido."
-                        />
-                        <TechniqueCard
-                            name="Rengoku Onigiri"
-                            translation="Corte del Demonio del Purgatorio"
-                            desc="Una versión vastamente más poderosa de su movimiento característico."
-                        />
-                    </div>
-                </div>
-
-                <div className="history-column">
-                    <SectionTitle title="Camino del Asura" icon={Map} />
-                    <div className="timeline">
-                        <TimelineItem
-                            year="East Blue"
-                            title="La Promesa"
-                            desc="Juró a Luffy convertirse en el Mejor Espadachín del Mundo o morir en el intento."
-                        />
-                        <TimelineItem
-                            year="Thriller Bark"
-                            title="No Pasó Nada"
-                            desc="Tomó todo el dolor de Luffy de Kuma, demostrando su lealtad."
-                        />
-                        <TimelineItem
-                            year="Salto Temporal"
-                            title="Inclinándose ante el Enemigo"
-                            desc="Rogó a Mihawk que lo entrenara por el bien de su capitán."
-                        />
-                        <TimelineItem
-                            year="País de Wano"
-                            title="Rey del Infierno"
-                            desc="Derrotó a King el Incendio y despertó el Haki del Conquistador avanzado."
-                        />
-                    </div>
-                </div>
+        <div className="carousel-container glass-panel">
+            <AnimatePresence mode="wait">
+                <motion.img
+                    key={currentIndex}
+                    src={images[currentIndex].src}
+                    alt={images[currentIndex].alt}
+                    className="carousel-image"
+                    initial={{ opacity: 0, x: 100 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -100 }}
+                    transition={{ duration: 0.5 }}
+                    onError={(e) => {
+                        e.target.src = `https://via.placeholder.com/800x400?text=${images[currentIndex].alt}`;
+                    }}
+                />
+            </AnimatePresence>
+            <button className="carousel-btn prev" onClick={prevSlide}><ChevronLeft /></button>
+            <button className="carousel-btn next" onClick={nextSlide}><ChevronRight /></button>
+            <div className="carousel-indicators">
+                {images.map((_, idx) => (
+                    <button
+                        key={idx}
+                        className={`indicator ${idx === currentIndex ? 'active' : ''}`}
+                        onClick={() => setCurrentIndex(idx)}
+                    />
+                ))}
             </div>
         </div>
     );
 };
 
-const SectionTitle = ({ title, icon: Icon }) => (
-    <div className="section-title-wrapper">
-        <Icon className="section-icon" size={24} />
-        <h2 className="section-title">{title}</h2>
+export const Zoro = () => {
+    return (
+        <div className="zoro-page">
+            <div className="zoro-hero-bg">
+                <div className="overlay-gradient"></div>
+                <img src="/images/zoro.jpg" alt="Zoro Background" className="bg-image" />
+            </div>
+
+            <div className="zoro-hero-content">
+                <motion.div
+                    className="zoro-header-content"
+                    initial={{ y: 50, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ duration: 0.8 }}
+                >
+                    <div className="role-chip">VICE-CAPITÁN</div>
+                    <h1 className="zoro-title">RORONOA <span className="text-green">ZORO</span></h1>
+                    <p className="zoro-subtitle">"El Rey del Infierno"</p>
+
+                    <div className="stats-row">
+                        <StatItem icon={Sword} label="Estilo" value="Santoryu" />
+                        <StatItem icon={Wind} label="Recompensa" value="1,111,000,000 ฿" />
+                        <StatItem icon={Zap} label="Haki" value="Conquistador" />
+                    </div>
+                </motion.div>
+            </div>
+
+            <div className="content-container">
+                <section className="section-block centered-section">
+                    <SectionTitle title="Galería de Combate" icon={Skull} />
+                    <Carousel />
+                </section>
+
+                <section className="section-block">
+                    <SectionTitle title="Arsenal Maldito" icon={Sword} />
+                    <div className="swords-grid">
+                        <SwordCard
+                            name="Wado Ichimonji"
+                            grade="O Wazamono"
+                            desc="La espada de la promesa. Su filo blanco representa la voluntad de Kuina."
+                            img="/images/wado.jpg"
+                        />
+                        <SwordCard
+                            name="Sandai Kitetsu"
+                            grade="Wazamono"
+                            desc="La espada maldita. Eligió a Zoro por su suerte superior a la maldición."
+                            img="/images/kitetsu.jpg"
+                        />
+                        <SwordCard
+                            name="Enma"
+                            grade="O Wazamono"
+                            desc="La espada del Infierno. Domarla requiere un Haki monstruoso."
+                            img="/images/enma.jpg"
+                        />
+                    </div>
+                </section>
+
+                <section className="section-block">
+                    <SectionTitle title="Posturas Maestras" icon={Zap} />
+                    <div className="postures-grid">
+                        <PostureCard
+                            name="Ittoryu: Iai Shishi Sonson"
+                            desc="Un corte veloz capaz de cortar el acero."
+                            img="/images/posture1.jpg"
+                        />
+                        <PostureCard
+                            name="Santoryu: Rengoku Onigiri"
+                            desc="Un ataque de tres vías que desgarra al oponente."
+                            img="/images/posture2.jpg"
+                        />
+                        <PostureCard
+                            name="Kyutoryu: Asura"
+                            desc="La manifestación del espíritu demoníaco de Zoro."
+                            img="/images/posture3.jpg"
+                        />
+                    </div>
+                </section>
+
+                <section className="section-block">
+                    <SectionTitle title="Camino del Guerrero" icon={Map} />
+                    <div className="timeline-horizontal">
+                        <TimelineEvent year="East Blue" event="Promesa a Kuina" />
+                        <TimelineEvent year="Baratie" event="Derrota ante Mihawk" />
+                        <TimelineEvent year="Thriller Bark" event="Sacrificio Silencioso" />
+                        <TimelineEvent year="Wano" event="Dominio de Enma" />
+                    </div>
+                </section>
+            </div>
+        </div>
+    );
+};
+
+const StatItem = ({ icon: Icon, label, value }) => (
+    <div className="stat-pill">
+        <Icon size={18} className="stat-icon" />
+        <div className="stat-info">
+            <span className="stat-label">{label}</span>
+            <span className="stat-value">{value}</span>
+        </div>
     </div>
 );
 
-const SwordItem = ({ name, desc, grade }) => (
+const SectionTitle = ({ title, icon: Icon }) => (
+    <div className="section-header">
+        <Icon size={32} className="section-header-icon" />
+        <h2>{title}</h2>
+        <div className="section-line"></div>
+    </div>
+);
+
+const SwordCard = ({ name, grade, desc, img }) => (
     <motion.div
-        className="sword-item"
-        whileHover={{ x: 10, borderColor: 'var(--zoro-green)' }}
+        className="sword-card"
+        whileHover={{ y: -10 }}
     >
-        <div className="sword-header">
-            <h3>{name}</h3>
-            <span className="sword-grade">{grade}</span>
+        <div className="sword-img-container">
+            <img
+                src={img}
+                alt={name}
+                onError={(e) => e.target.src = 'https://via.placeholder.com/400x150?text=Sword+Image'}
+            />
+            <div className="sword-grade-badge">{grade}</div>
         </div>
-        <p>{desc}</p>
-    </motion.div>
-);
-
-const TechniqueCard = ({ name, translation, desc }) => (
-    <motion.div
-        className="technique-card"
-        whileHover={{ scale: 1.02, backgroundColor: 'rgba(0, 250, 154, 0.05)' }}
-    >
-        <h3>{name}</h3>
-        <div className="translation">{translation}</div>
-        <p>{desc}</p>
-    </motion.div>
-);
-
-const TimelineItem = ({ year, title, desc }) => (
-    <div className="timeline-item">
-        <div className="timeline-marker"></div>
-        <div className="timeline-content">
-            <div className="timeline-year">{year}</div>
-            <h4>{title}</h4>
+        <div className="sword-content">
+            <h3>{name}</h3>
             <p>{desc}</p>
         </div>
+    </motion.div>
+);
+
+const PostureCard = ({ name, desc, img }) => (
+    <motion.div
+        className="posture-card"
+        whileHover={{ scale: 1.02 }}
+    >
+        <div className="posture-img-container">
+            <img
+                src={img}
+                alt={name}
+                onError={(e) => e.target.src = 'https://via.placeholder.com/400x300?text=Move'}
+            />
+        </div>
+        <div className="posture-content">
+            <h4>{name}</h4>
+            <p>{desc}</p>
+        </div>
+    </motion.div>
+);
+
+const TimelineEvent = ({ year, event }) => (
+    <div className="timeline-event">
+        <div className="timeline-dot"></div>
+        <span className="timeline-year">{year}</span>
+        <span className="timeline-text">{event}</span>
     </div>
 );

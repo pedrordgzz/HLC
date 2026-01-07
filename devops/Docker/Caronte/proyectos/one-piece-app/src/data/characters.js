@@ -399,5 +399,178 @@ export const characters = [
             'Es comandado por Tashigi.',
             'Es conocido como el "Cazador Blanco".'
         ]
+    },
+    // --- Cuatro Emperadores (Yonko) ---
+    {
+        id: 'shanks',
+        name: 'Shanks',
+        affiliation: 'Piratas del Pelirrojo',
+        role: 'Capitán',
+        bounty: '4,048,900,000',
+        devilFruit: { hasFruit: false, name: null, type: null },
+        haki: ['Conquistador', 'Armamento', 'Observación'],
+        description: 'El jefe de los Piratas del Pelirrojo y quien inspiró a Luffy. Poseedor de un Haki del Conquistador abrumador.',
+        image: '/images/shanks.jpg',
+        hints: ['Perdió su brazo salvando a Luffy.', 'Fue aprendiz en el barco de Roger.', 'Detuvo la Guerra de Marineford.', 'Es un maestro del Haki.', 'Tiene una cicatriz en el ojo izquierdo hecha por Barbanegra.']
+    },
+    {
+        id: 'blackbeard',
+        name: 'Marshall D. Teach',
+        affiliation: 'Piratas de Barbanegra',
+        role: 'Almirante',
+        bounty: '3,996,000,000',
+        devilFruit: { hasFruit: true, name: 'Yami Yami / Gura Gura', type: 'Logia / Paramecia' },
+        haki: ['Armamento', 'Observación'],
+        description: 'El único ser conocido capaz de usar dos Frutas del Diablo.',
+        image: '/images/blackbeard.jpg',
+        hints: ['Traicionó a Barbablanca matando a Thatch.', 'Entregó a Ace a la Marina.', 'Posee el poder de la Oscuridad y el Terremoto.', 'Su bandera tiene tres calaveras.', 'Le encantan las tartas de cereza.']
+    },
+    {
+        id: 'kaido',
+        name: 'Kaido',
+        affiliation: 'Piratas Bestia',
+        role: 'Gobernador General',
+        bounty: '4,611,100,000',
+        devilFruit: { hasFruit: true, name: 'Uo Uo no Mi, Modelo: Seiryu', type: 'Zoan Mítica' },
+        haki: ['Conquistador', 'Armamento', 'Observación'],
+        description: 'La Criatura más Fuerte del Mundo. Gobernó Wano con puño de hierro.',
+        image: '/images/kaido.jpg',
+        hints: ['Puede transformarse en un dragón gigante.', 'Intentó suicidarse múltiples veces por diversión.', 'Tiene una hija llamada Yamato.', 'Fue derrotado por Luffy en Onigashima.', 'Bebedor empedernido.']
+    },
+    {
+        id: 'bigmom',
+        name: 'Charlotte Linlin',
+        affiliation: 'Piratas de Big Mom',
+        role: 'Reina',
+        bounty: '4,388,000,000',
+        devilFruit: { hasFruit: true, name: 'Soru Soru no Mi', type: 'Paramecia' },
+        haki: ['Conquistador', 'Armamento', 'Observación'],
+        description: 'La Reina de Totto Land. Sueña con una familia de todas las razas.',
+        image: '/images/bigmom.jpg',
+        hints: ['Tiene 85 hijos.', 'Puede robar la esperanza de vida.', 'Sufre de ataques de hambre incontrolables.', 'Creó a Zeus, Prometheus y Napoleon.', 'Tiene una piel de hierro natural.']
+    },
+    {
+        id: 'buggy',
+        name: 'Buggy el Payaso',
+        affiliation: 'Cross Guild',
+        role: 'Presidente',
+        bounty: '3,189,000,000',
+        devilFruit: { hasFruit: true, name: 'Bara Bara no Mi', type: 'Paramecia' },
+        haki: ['Observación (Básico)'],
+        description: 'Un pirata suertudo que ascendió a Emperador por error.',
+        image: '/images/buggy.jpg',
+        hints: ['Es inmune a los cortes.', 'Fue aprendiz de Roger junto a Shanks.', 'Odia que se burlen de su nariz.', 'Líder de la organización Cross Guild (en papel).', 'Inventó la Buggy Bala.']
+    },
+
+    // --- Guerreros del Mar (Ex y Actuales) ---
+    {
+        id: 'mihawk',
+        name: 'Dracule Mihawk',
+        affiliation: 'Cross Guild',
+        role: 'Espadachín',
+        bounty: '3,590,000,000',
+        devilFruit: { hasFruit: false, name: null, type: null },
+        haki: ['Armamento', 'Observación'],
+        description: 'El Espadachín más Fuerte del Mundo. Empuña la espada negra Yoru.',
+        image: '/images/mihawk.jpg',
+        hints: ['Viaja en un bote ataúd.', 'Entrenó a Zoro.', 'Es rival de Shanks.', 'Tiene ojos de halcón.', 'No tiene tripulación pero vive con Perona y mandriles.']
+    },
+    {
+        id: 'crocodile',
+        name: 'Sir Crocodile',
+        affiliation: 'Cross Guild',
+        role: 'Fundador',
+        bounty: '1,965,000,000',
+        devilFruit: { hasFruit: true, name: 'Suna Suna no Mi', type: 'Logia' },
+        haki: ['Armamento', 'Observación'],
+        description: 'Ex guerrero del mar y cerebro criminal. Puede controlar la arena.',
+        image: '/images/crocodile.jpg',
+        hints: ['Intentó apoderarse de Alabasta.', 'Tiene un garfio venenoso.', 'Su debilidad es el agua (o líquidos).', 'Fue derrotado por Luffy en el desierto.', 'Fuma puros constantemente.']
+    },
+    {
+        id: 'hancock',
+        name: 'Boa Hancock',
+        affiliation: 'Piratas Kuja',
+        role: 'Emperatriz Pirata',
+        bounty: '1,659,000,000',
+        devilFruit: { hasFruit: true, name: 'Mero Mero no Mi', type: 'Paramecia' },
+        haki: ['Conquistador', 'Armamento', 'Observación'],
+        description: 'La mujer más hermosa del mundo y líder de las Amazonas Lily.',
+        image: '/images/hancock.jpg',
+        hints: ['Está enamorada de Luffy.', 'Puede convertir a la gente en piedra.', 'Fue esclava de los Dragones Celestiales.', 'Tiene dos hermanas serpiente.', 'Odia a los hombres (excepto a Luffy).']
+    },
+    {
+        id: 'doflamingo',
+        name: 'Donquixote Doflamingo',
+        affiliation: 'Piratas Donquixote',
+        role: 'Capitán',
+        bounty: '340,000,000 (Congelada)',
+        devilFruit: { hasFruit: true, name: 'Ito Ito no Mi', type: 'Paramecia' },
+        haki: ['Conquistador', 'Armamento', 'Observación'],
+        description: 'El Demonio Celestial. Gobernó Dressrosa desde las sombras.',
+        image: '/images/doflamingo.jpg',
+        hints: ['Es un ex Dragón Celestial.', 'Controla a las personas como marionetas con hilos.', 'Siempre usa gafas de sol.', 'Su apodo es "Joker".', 'Asesinó a su propio hermano y padre.']
+    },
+    {
+        id: 'law',
+        name: 'Trafalgar D. Water Law',
+        affiliation: 'Piratas Heart',
+        role: 'Capitán / Médico',
+        bounty: '3,000,000,000',
+        devilFruit: { hasFruit: true, name: 'Ope Ope no Mi', type: 'Paramecia' },
+        haki: ['Armamento', 'Observación'],
+        description: 'El Cirujano de la Muerte. Formó una alianza clave con Luffy.',
+        image: '/images/law.jpg',
+        hints: ['Puede operar dentro de su "Room".', 'Busca conocer el significado de la "D".', 'Odia el pan.', 'Viaja en un submarino amarillo.', 'Sobrevivió gracias al sacrificio de Corazón.']
+    },
+
+    // --- Leyendas y Otros ---
+    {
+        id: 'ace',
+        name: 'Portgas D. Ace',
+        affiliation: 'Piratas de Barbablanca',
+        role: 'Comandante 2ª División',
+        bounty: '550,000,000',
+        devilFruit: { hasFruit: true, name: 'Mera Mera no Mi', type: 'Logia' },
+        haki: ['Conquistador', 'Armamento', 'Observación'],
+        description: 'El hermano mayor de Luffy. Hijo de Gol D. Roger.',
+        image: '/images/ace.jpg',
+        hints: ['Murió protegiendo a Luffy en Marineford.', 'Su padre era el Rey de los Piratas.', 'Tenía pecas y siempre se quedaba dormido comiendo.', 'Persiguió a Barbanegra por venganza.', 'Su tatuaje tenía una "S" tachada.']
+    },
+    {
+        id: 'yamato',
+        name: 'Yamato',
+        affiliation: 'Alianza Ninja-Pirata-Mink-Samurái',
+        role: 'Guardián',
+        bounty: 'Desconocida',
+        devilFruit: { hasFruit: true, name: 'Inu Inu no Mi, Modelo: Okuchi no Makami', type: 'Zoan Mítica' },
+        haki: ['Conquistador', 'Armamento', 'Observación'],
+        description: 'Hijo de Kaido que se autoproclama Kozuki Oden.',
+        image: '/images/yamato.jpg',
+        hints: ['Quiere salir al mar como Oden.', 'Conoció a Ace en Wano.', 'Leyó el diario de Oden.', 'Tiene cuernos de oni.', 'Peleó contra su padre Kaido en el tejado.']
+    },
+    {
+        id: 'rayleigh',
+        name: 'Silvers Rayleigh',
+        affiliation: 'Piratas de Roger',
+        role: 'Vicecapitán (Retirado)',
+        bounty: 'Desconocida',
+        devilFruit: { hasFruit: false, name: null, type: null },
+        haki: ['Conquistador', 'Armamento', 'Observación'],
+        description: 'El Rey Oscuro. Primer oficial del Rey de los Piratas.',
+        image: '/images/rayleigh.jpg',
+        hints: ['Entrenó a Luffy en Haki durante 2 años.', 'Vive en el Archipiélago Sabaody.', 'Es un experto recubridor de barcos.', 'Nadó por el Calm Belt.', 'Le gusta el alcohol y las apuestas.']
+    },
+    {
+        id: 'kuma',
+        name: 'Bartholomew Kuma',
+        affiliation: 'Ejército Revolucionario',
+        role: 'Ex Comandante',
+        bounty: '296,000,000 (Antes)',
+        devilFruit: { hasFruit: true, name: 'Nikyu Nikyu no Mi', type: 'Paramecia' },
+        haki: ['Armamento', 'Observación'],
+        description: 'El Tirano. Fue convertido en el Pacifista PX-0.',
+        image: '/images/kuma.jpg',
+        hints: ['Tiene almohadillas de pata en las manos.', 'Puede repeler cualquier cosa, incluido el dolor.', 'Es el padre de Jewelry Bonney.', 'Protegió el Sunny durante 2 años.', 'Pertenece a la raza Buccaneer.']
     }
 ];

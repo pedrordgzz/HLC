@@ -23,7 +23,7 @@ services:
   zoro:
     build:
       context: ../one-piece-app
-      dockerfile: Dockerfile
+      dockerfile: deploy/Dockerfile
     container_name: zoro_app
     networks:
       - app_network
