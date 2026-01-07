@@ -1,0 +1,21 @@
+services:
+  web:
+    build:
+      context: ../
+      dockerfile: deploy/Dockerfile
+    container_name: one-piece-app
+    ports:
+      - "${PORT_WEB}:80"
+    env_file:
+      - ./.env
+    networks:
+      netnodeclase:
+        ipv4_address: ${IP}
+
+networks:
+  netnodeclase:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: ${SUBNET}
