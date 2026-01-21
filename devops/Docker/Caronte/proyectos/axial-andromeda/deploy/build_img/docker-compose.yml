@@ -1,8 +1,8 @@
 services:
   portfolio:
     build: 
-      context: ..
-      dockerfile: ./build_img/Dockerfile
+      context: ../..
+      dockerfile: deploy/build_img/Dockerfile
       args:
         - PROYECTO=${PROYECTO}
         - USUARIO=${USUARIO}
