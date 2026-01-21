@@ -1,7 +1,7 @@
 services:
   web:
     build:
-      context: ${CONTEXTO}
+      context: /home/pedro/HLC/devops/Docker/Caronte/
       dockerfile: ./dockerfiles/preact/Dockerfile
     container_name: ctr_web
     ports:

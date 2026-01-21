@@ -1,0 +1,7 @@
+services:
+  portfolio:
+    build: 
+      context: ../..
+      dockerfile: ./Dockerfile
+    container_name: portfolio_build
+    image: peedroorgzz/portfolio
