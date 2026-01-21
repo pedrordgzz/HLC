@@ -1,14 +1,6 @@
-# Build Stage
-FROM node:18-alpine as build
-WORKDIR /app
-COPY package.json package-lock.json ./
-RUN npm ci
-COPY . .
-RUN npm run build
-
-# Production Stage
-FROM nginx:alpine
-COPY --from=build /app/dist /usr/share/nginx/html
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+FROM httpd:2.4 
+ARG PROYECTO
+ARG USUARIO
+ARG TIPO
+COPY ./dist/* /usr/local/apache2/htdocs/
 EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]

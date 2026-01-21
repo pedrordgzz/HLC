@@ -1,7 +1,14 @@
 services:
   portfolio:
     build: 
-      context: ../..
-      dockerfile: ./Dockerfile
+      context: ..
+      dockerfile: ./build_img/Dockerfile
+      args:
+        - PROYECTO=${PROYECTO}
+        - USUARIO=${USUARIO}
+        - TIPO=${TIPO}
     container_name: portfolio_build
     image: peedroorgzz/portfolio
+    hostname: portfolio_build
+    env_file:
+      - ./.env
