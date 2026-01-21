@@ -7,7 +7,7 @@ metadata:
     nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
   rules:
-    - host: webtaller.jamorgado.es
+    - host: webtaller.pedrorodriguezgimenez.es
       http:
         paths:
           - path: /
