@@ -1,0 +1,15 @@
+services:
+  webtaller:
+    build: 
+      context: ..
+      dockerfile: ./deploy/Dockerfile
+      args:
+        - PROYECTO=${PROYECTO}
+        - USUARIO=${USUARIO}
+        - TIPO=${TIPO}
+    container_name: web_taller
+
+    image: peedroorgzz/webtallerclase
+    hostname: web_taller
+    env_file:
+      - ./.env

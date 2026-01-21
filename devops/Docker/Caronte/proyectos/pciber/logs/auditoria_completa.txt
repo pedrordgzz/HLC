@@ -1,0 +1,14 @@
+   INFORME DE CIBERSEGURIDAD AUTOMATIZADO
+   Fecha: Wed Dec 17 08:28:31 UTC 2025
+   Analizando IP: 172.120.50.25
+
+--- RESULTADOS NMAP ---
+Starting Nmap 7.94SVN ( https://nmap.org ) at 2025-12-17 08:28 UTC
+Nmap scan report for 754fc5de7ec6 (172.120.50.25)
+Host is up (0.000010s latency).
+All 1000 scanned ports on 754fc5de7ec6 (172.120.50.25) are in ignored states.
+Not shown: 1000 closed tcp ports (reset)
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 0.59 seconds
+   AUDITORÍA FINALIZADA
