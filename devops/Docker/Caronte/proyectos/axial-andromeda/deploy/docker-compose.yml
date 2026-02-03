@@ -4,6 +4,7 @@ services:
       context: /home/pedro/HLC/devops/Docker/Caronte/
       dockerfile: ./dockerfiles/preact/Dockerfile
     container_name: ctr_web
+    image: peedroorgzz/portfolio
     ports:
       - "3000:${PORT_NODE}"   
       - "${PORT_WEB}:80"
