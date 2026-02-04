@@ -1,0 +1,16 @@
+app:
+  name: miportfolio
+  image: 
+    repository: peedroorgzz/portfolio
+    tag: latest
+    pullPolicy: Always
+  container:
+    name: miportfolio
+    port: 80
+    replicaCount: 3
+  service :
+    port: 80
+    nodePort: 30001
+  ingress:
+    host: portfolio.pedrorodriguezgimenez.es
+    

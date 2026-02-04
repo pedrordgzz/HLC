@@ -1,0 +1,80 @@
+---
+# Source: mi-portfolio-con-helm/templates/service-portfolio.yml
+apiVersion: v1
+kind: Service
+metadata:
+  name: miportfolio
+  namespace: jenkins
+spec:
+  type: NodePort
+  selector:
+    app: miportfolio
+  ports:  
+  - port: 80
+    targetPort: 80
+    nodePort: 30001
+---
+# Source: mi-portfolio-con-helm/templates/deploy-portfolio.yml
+apiVersion: apps/v1
+kind: Deployment 
+metadata:
+  name: deploy-miportfolio
+  namespace: jenkins
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: miportfolio
+  template:
+    metadata:
+      labels:
+        app: miportfolio
+    spec:
+      containers:
+      - name: miportfolio
+        image: peedroorgzz/portfolio:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 80
+---
+# Source: mi-portfolio-con-helm/templates/ingress-portfolio.yml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-miportfolio
+  namespace: jenkins
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  rules:
+    - host: portfolio.pedrorodriguezgimenez.es
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: portfolio-taller
+                port:
+                  number: 80
+---
+# Source: mi-portfolio-con-helm/templates/tests/test-connection.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: 'jenkins-mi-portfolio-con-helm-test-connection'
+  labels:
+    helm.sh/chart: mi-portfolio-con-helm-0.1.0
+    app.kubernetes.io/name: mi-portfolio-con-helm
+    app.kubernetes.io/instance: jenkins
+    app.kubernetes.io/version: "1.16.0"
+    app.kubernetes.io/managed-by: Helm
+  annotations:
+    "helm.sh/hook": test
+spec:
+  containers:
+    - name: wget
+      image: busybox
+      command: ['wget']
+      args: ['jenkins-mi-portfolio-con-helm:80']
+  restartPolicy: Never
