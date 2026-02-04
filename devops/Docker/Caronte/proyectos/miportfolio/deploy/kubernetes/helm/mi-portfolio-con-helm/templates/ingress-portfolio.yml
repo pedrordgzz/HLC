@@ -14,6 +14,6 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: portfolio-taller
+                name: {{.Values.app.name}}
                 port:
                   number: {{.Values.app.service.port}}
