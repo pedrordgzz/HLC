@@ -5,6 +5,6 @@ type: application
 version: 0.1.0
 
 dependencies:
-  name: jenkins
-  version: 5.8.7
-  repository: https://charts.jenkins.io/
+  - name: jenkins
+    version: 5.8.7
+    repository: https://charts.jenkins.io/
