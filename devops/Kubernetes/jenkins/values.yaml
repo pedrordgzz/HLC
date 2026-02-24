@@ -21,14 +21,14 @@ controller:
   ingress:
     enabled: true
     ingressClassName: nginx
-    hostName: jenkins.peedroorgzz.es
+    hostName: jenkins.pedrorodriguezgimenez.es
     annotations:
       cert-manager.io/cluster-issuer: letsencrypt-prod
       nginx.ingress.kubernetes.io/ssl-redirect: "true"
     tls:
       - secretName: jenkins-tls
         hosts:
-          - jenkins.peedroorgzz.es
+          - jenkins.pedrorodriguezgimenez.es
   additionalPlugins: []
   installPlugins:
     - configuration-as-code
