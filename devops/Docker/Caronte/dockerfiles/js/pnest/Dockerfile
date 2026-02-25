@@ -1,6 +1,7 @@
 FROM peedroorgzz/nginx
 
 ARG PROYECTO
+ENV PROYECTO=${PROYECTO}
 
 USER root
 
