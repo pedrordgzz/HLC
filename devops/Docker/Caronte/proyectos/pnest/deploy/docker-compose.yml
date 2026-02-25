@@ -1,0 +1,27 @@
+services:
+  pnest:
+    build:
+      context: ${CONTEXTO}
+      dockerfile: ./dockerfiles/js/pnest/Dockerfile
+      args:
+        - PROYECTO=${PROYECTO}
+    container_name: ${NOMBRE}
+    image: peedroorgzz/pnest:latest
+    ports:
+      - "${PORT_WEB}:3000"
+    env_file:
+      - ./.env
+    volumes:
+      - ./logs:/root/logs
+      - ../../pnest/:/root/admin/pnest/
+    networks:
+      netpnest:
+        ipv4_address: ${IP}
+
+networks:
+  netpnest:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: ${SUBNET}
