@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pnest
+  namespace: default
+  labels:
+    app: pnest
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pnest
+  template:
+    metadata:
+      labels:
+        app: pnest
+    spec:
+      containers:
+        - name: pnest
+          image: peedroorgzz/pnest:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 3000
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "256Mi"
+              cpu: "250m"
