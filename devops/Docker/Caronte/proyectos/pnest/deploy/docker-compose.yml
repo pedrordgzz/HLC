@@ -17,6 +17,7 @@ services:
     networks:
       netpnest:
         ipv4_address: ${IP}
+      ppostgres_netcaronte:  # se une a la red del contenedor Postgres
 
 networks:
   netpnest:
@@ -25,3 +26,6 @@ networks:
       driver: default
       config:
         - subnet: ${SUBNET}
+
+  ppostgres_netcaronte:
+    external: true           # red ya creada por el proyecto ppostgres

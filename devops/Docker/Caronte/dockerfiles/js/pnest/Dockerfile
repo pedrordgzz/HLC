@@ -5,7 +5,7 @@ ENV PROYECTO=${PROYECTO}
 
 USER root
 
-# Instalamos Node.js 22
+# Instalar Node.js 22 (pg no necesita compilación nativa, sin python/make/g++)
 RUN apt-get update && \
     apt-get install -y curl ca-certificates gnupg && \
     curl -fsSL https://deb.nodesource.com/setup_22.x | bash - && \
@@ -13,15 +13,15 @@ RUN apt-get update && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-# Creamos la carpeta del proyecto y copiamos el código fuente
+# Crear carpeta del proyecto y copiar código fuente
 RUN mkdir -p /root/admin/${PROYECTO}/
 COPY ./proyectos/${PROYECTO}/ /root/admin/${PROYECTO}/
 WORKDIR /root/admin/${PROYECTO}
 
-# Copiamos el start.sh fuera del proyecto
+# Copiar el script de inicio
 COPY ./dockerfiles/js/pnest/admin/start.sh /root/start.sh
 RUN chmod +x /root/start.sh
 
-EXPOSE 3000
+EXPOSE 3001
 
 ENTRYPOINT ["/root/start.sh"]

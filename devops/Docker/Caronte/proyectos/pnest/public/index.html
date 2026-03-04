@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cineplex API - Películas</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;900&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0a0a0c;
+      --surface: #141417;
+      --card: #1c1c21;
+      --border: #2d2d35;
+      --accent: #d4a373;
+      /* Gold/Champagne */
+      --accent-hover: #faedcd;
+      --danger: #e63946;
+      --success: #2ecc71;
+      --text: #f8f9fa;
+      --muted: #a0a0a5;
+      --radius: 12px;
+      --glare: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0) 50%);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Outfit', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── HEADER ── */
+    header {
+      background: linear-gradient(to bottom, #1a1a1a, var(--bg));
+      border-bottom: 1px solid var(--border);
+      padding: 24px 40px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(10px);
+    }
+
+    .logo-icon {
+      font-size: 2.5rem;
+      animation: pulse 2s infinite ease-in-out;
+    }
+
+    @keyframes pulse {
+
+      0%,
+      100% {
+        transform: scale(1);
+        filter: drop-shadow(0 0 0px var(--accent));
+      }
+
+      50% {
+        transform: scale(1.05);
+        filter: drop-shadow(0 0 10px var(--accent));
+      }
+    }
+
+    header h1 {
+      font-size: 1.8rem;
+      font-weight: 900;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      background: linear-gradient(90deg, var(--accent), #fff);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    header span {
+      color: var(--muted);
+      font-size: 0.85rem;
+      margin-left: auto;
+      font-weight: 500;
+    }
+
+    /* ── FILTROS ── */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    .toolbar {
+      margin-top: 32px;
+      padding: 24px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      align-items: flex-end;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      flex: 1;
+      min-width: 180px;
+    }
+
+    .field label {
+      font-size: 0.7rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      font-weight: 700;
+    }
+
+    input {
+      background: #000;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: #fff;
+      padding: 12px 16px;
+      font-family: inherit;
+      font-size: 0.95rem;
+      outline: none;
+      transition: all .2s;
+    }
+
+    input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px rgba(212, 163, 115, 0.2);
+    }
+
+    .btn {
+      padding: 12px 24px;
+      border-radius: 8px;
+      border: none;
+      font-family: inherit;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all .2s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.9rem;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #000;
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-hover);
+      transform: translateY(-2px);
+    }
+
+    .btn-outline {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text);
+    }
+
+    .btn-outline:hover {
+      background: var(--border);
+    }
+
+    .btn-add {
+      background: #fff;
+      color: #000;
+      margin-left: auto;
+    }
+
+    .btn-add:hover {
+      transform: scale(1.05);
+      box-shadow: 0 5px 15px rgba(255, 255, 255, 0.2);
+    }
+
+    /* ── GRID ── */
+    .movie-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 24px;
+      margin: 40px 0 80px;
+    }
+
+    .movie-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      position: relative;
+      transition: all .3s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .movie-card:hover {
+      transform: translateY(-8px) scale(1.02);
+      border-color: var(--accent);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+    }
+
+    .movie-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: var(--glare);
+      opacity: 0;
+      transition: opacity .3s;
+      pointer-events: none;
+    }
+
+    .movie-card:hover::before {
+      opacity: 1;
+    }
+
+    .card-content {
+      padding: 24px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .card-header {
+      margin-bottom: 20px;
+    }
+
+    .card-year {
+      font-size: 0.8rem;
+      color: var(--accent);
+      font-weight: 800;
+      margin-bottom: 4px;
+      display: block;
+    }
+
+    .card-title {
+      font-size: 1.4rem;
+      font-weight: 800;
+      line-height: 1.2;
+      margin-bottom: 8px;
+      color: #fff;
+    }
+
+    .card-director {
+      font-size: 0.9rem;
+      color: var(--muted);
+      font-style: italic;
+    }
+
+    .card-meta {
+      margin-top: auto;
+      padding-top: 16px;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .duration {
+      font-size: 0.85rem;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .action-btn {
+      flex: 1;
+      padding: 8px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      cursor: pointer;
+      text-transform: uppercase;
+      border: 1px solid transparent;
+      transition: all .2s;
+    }
+
+    .btn-edit {
+      background: rgba(212, 163, 115, 0.1);
+      color: var(--accent);
+      border-color: rgba(212, 163, 115, 0.2);
+    }
+
+    .btn-edit:hover {
+      background: var(--accent);
+      color: #000;
+    }
+
+    .btn-delete {
+      background: rgba(230, 57, 70, 0.1);
+      color: var(--danger);
+      border-color: rgba(230, 57, 70, 0.2);
+    }
+
+    .btn-delete:hover {
+      background: var(--danger);
+      color: #fff;
+    }
+
+    /* ── MODAL ── */
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(8px);
+      z-index: 200;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity .3s;
+    }
+
+    .overlay.active {
+      display: flex;
+      opacity: 1;
+    }
+
+    .modal {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 40px;
+      width: 100%;
+      max-width: 480px;
+      transform: scale(0.9);
+      transition: transform .3s;
+    }
+
+    .overlay.active .modal {
+      transform: scale(1);
+    }
+
+    .modal h2 {
+      margin-bottom: 24px;
+      font-weight: 900;
+      letter-spacing: 1px;
+    }
+
+    /* ── LOADER ── */
+    .loader {
+      padding: 100px;
+      text-align: center;
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 16px;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* ── TOAST ── */
+    #toast {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: var(--accent);
+      color: #000;
+      padding: 14px 28px;
+      border-radius: 50px;
+      font-weight: 700;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      z-index: 1000;
+      transition: all .4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    #toast.show {
+      transform: translateX(-50%) translateY(0);
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <div class="logo-icon">🎬</div>
+    <h1>Cineplex API</h1>
+    <span id="api-status">CONECTANDO...</span>
+  </header>
+
+  <main class="container">
+    <div class="toolbar">
+      <div class="field">
+        <label>Título</label>
+        <input type="text" id="q-titulo" placeholder="Ej: Monsters Inc" />
+      </div>
+      <div class="field" style="max-width: 120px;">
+        <label>Año Desde</label>
+        <input type="number" id="q-desde" placeholder="1900" />
+      </div>
+      <div class="field" style="max-width: 120px;">
+        <label>Año Hasta</label>
+        <input type="number" id="q-hasta" placeholder="2025" />
+      </div>
+      <button class="btn btn-primary" onclick="buscar()">BUSCAR</button>
+      <button class="btn btn-outline" onclick="resetFiltros()">RESET</button>
+      <button class="btn btn-add" onclick="abrirModal()">+ NUEVA PELÍCULA</button>
+    </div>
+
+    <div id="grid" class="movie-grid">
+      <div class="loader">
+        <div class="spinner"></div>CARGANDO CARTELERA...
+      </div>
+    </div>
+  </main>
+
+  <!-- MODAL -->
+  <div class="overlay" id="overlay">
+    <div class="modal">
+      <h2 id="modal-title">Nueva Película</h2>
+      <div style="display: flex; flex-direction: column; gap: 20px;">
+        <input type="hidden" id="m-id" />
+        <div class="field">
+          <label>Título</label>
+          <input type="text" id="m-titulo" />
+        </div>
+        <div class="field">
+          <label>Director</label>
+          <input type="text" id="m-director" />
+        </div>
+        <div style="display: flex; gap: 16px;">
+          <div class="field">
+            <label>Año</label>
+            <input type="number" id="m-year" />
+          </div>
+          <div class="field">
+            <label>Duración (min)</label>
+            <input type="number" id="m-duracion" />
+          </div>
+        </div>
+        <div style="display: flex; gap: 12px; margin-top: 10px;">
+          <button class="btn btn-outline" style="flex: 1;" onclick="cerrarModal()">CANCELAR</button>
+          <button class="btn btn-primary" style="flex: 1;" onclick="guardar()">GUARDAR</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast">MENSAJE</div>
+
+  <script>
+    const API = '/peliculas';
+
+    async function callAPI(endpoint, method = 'GET', body = null) {
+      const options = { method };
+      if (body) {
+        options.headers = { 'Content-Type': 'application/json' };
+        options.body = JSON.stringify(body);
+      }
+      const res = await fetch(endpoint, options);
+      if (!res.ok && res.status !== 204) throw new Error(await res.text());
+      return res.status === 204 ? null : res.json();
+    }
+
+    async function cargar() {
+      const grid = document.getElementById('grid');
+      grid.innerHTML = '<div class="loader"><div class="spinner"></div>CARGANDO...</div>';
+      try {
+        const data = await callAPI(API);
+        render(data);
+        document.getElementById('api-status').textContent = '✅ API ACTIVA · ' + data.length + ' PELÍCULAS';
+      } catch (e) {
+        grid.innerHTML = '<div class="loader">❌ ERROR AL CONECTAR CON LA API</div>';
+        document.getElementById('api-status').textContent = '❌ API OFFLINE';
+      }
+    }
+
+    function render(movies) {
+      const grid = document.getElementById('grid');
+      if (movies.length === 0) {
+        grid.innerHTML = '<div class="loader">🎬 NO SE ENCONTRARON PELÍCULAS</div>';
+        return;
+      }
+      grid.innerHTML = movies.map(m => `
+      <div class="movie-card">
+        <div class="card-content">
+          <div class="card-header">
+            <span class="card-year">${m.year}</span>
+            <h3 class="card-title">${m.titulo}</h3>
+            <p class="card-director">Dirigida por ${m.director}</p>
+          </div>
+          <div class="card-meta">
+            <div class="duration">⏱️ ${m.duracion_minutos} min</div>
+          </div>
+          <div class="actions">
+            <button class="action-btn btn-edit" onclick="editar(${m.id}, '${m.titulo.replace(/'/g, "\\'")}', '${m.director.replace(/'/g, "\\'")}', ${m.year}, ${m.duracion_minutos})">Editar</button>
+            <button class="action-btn btn-delete" onclick="borrar(${m.id})">Borrar</button>
+          </div>
+        </div>
+      </div>
+    `).join('');
+    }
+
+    async function buscar() {
+      const t = document.getElementById('q-titulo').value;
+      const d = document.getElementById('q-desde').value;
+      const h = document.getElementById('q-hasta').value;
+
+      let url = `${API}/query?`;
+      if (t) url += `titulo=${t}&`;
+      if (d) url += `yearInicio=${d}&`;
+      if (h) url += `yearFin=${h}&`;
+
+      try {
+        const data = await callAPI(url);
+        render(data);
+      } catch (e) { toast('Error al buscar', true); }
+    }
+
+    function resetFiltros() {
+      document.getElementById('q-titulo').value = '';
+      document.getElementById('q-desde').value = '';
+      document.getElementById('q-hasta').value = '';
+      cargar();
+    }
+
+    async function borrar(id) {
+      if (!confirm('¿Seguro que quieres borrar esta pieza de cine?')) return;
+      try {
+        await callAPI(`${API}/${id}`, 'DELETE');
+        toast('Película eliminada');
+        cargar();
+      } catch (e) { toast('Error al borrar', true); }
+    }
+
+    function abrirModal() {
+      document.getElementById('m-id').value = '';
+      document.getElementById('m-titulo').value = '';
+      document.getElementById('m-director').value = '';
+      document.getElementById('m-year').value = '';
+      document.getElementById('m-duracion').value = '';
+      document.getElementById('modal-title').textContent = 'Nueva Película';
+      document.getElementById('overlay').classList.add('active');
+    }
+
+    function editar(id, t, d, y, dur) {
+      document.getElementById('m-id').value = id;
+      document.getElementById('m-titulo').value = t;
+      document.getElementById('m-director').value = d;
+      document.getElementById('m-year').value = y;
+      document.getElementById('m-duracion').value = dur;
+      document.getElementById('modal-title').textContent = 'Editar Película';
+      document.getElementById('overlay').classList.add('active');
+    }
+
+    function cerrarModal() {
+      document.getElementById('overlay').classList.remove('active');
+    }
+
+    async function guardar() {
+      const id = document.getElementById('m-id').value;
+      const body = {
+        titulo: document.getElementById('m-titulo').value,
+        director: document.getElementById('m-director').value,
+        year: parseInt(document.getElementById('m-year').value),
+        duracion_minutos: parseInt(document.getElementById('m-duracion').value)
+      };
+
+      if (!body.titulo || !body.director || isNaN(body.year)) {
+        toast('Rellena los campos obligatorios', true);
+        return;
+      }
+
+      try {
+        if (id) {
+          await callAPI(`${API}/${id}`, 'PUT', body);
+          toast('Película actualizada');
+        } else {
+          await callAPI(API, 'POST', body);
+          toast('Película añadida');
+        }
+        cerrarModal();
+        cargar();
+      } catch (e) { toast('Error al guardar', true); }
+    }
+
+    function toast(msg, error = false) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.style.background = error ? 'var(--danger)' : 'var(--accent)';
+      t.style.color = error ? '#fff' : '#000';
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 3000);
+    }
+
+    // Click fuera para cerrar modal
+    document.getElementById('overlay').onclick = (e) => {
+      if (e.target.id === 'overlay') cerrarModal();
+    }
+
+    cargar();
+  </script>
+</body>
+
+</html>
