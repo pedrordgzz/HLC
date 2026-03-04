@@ -10,7 +10,6 @@ log() {
 
 # =============================================
 # Llama al entrypoint de ciber en segundo plano
-# REPORT_FILE necesario para ciber/start.sh
 # =============================================
 load_entrypoint_ciber() {
     export REPORT_FILE="${REPORT_FILE:-/dev/null}"
@@ -18,15 +17,14 @@ load_entrypoint_ciber() {
 }
 
 # =============================================
-# Detectar variables de PostgreSQL en tiempo real
-# (Ubuntu pone las libs en /usr/lib/postgresql/{ver}/)
+# Detectar PG_BIN y PGDATA en tiempo real
 # =============================================
 detect_pg_vars() {
     local PG_VER
     PG_VER=$(ls /usr/lib/postgresql/ | sort -V | tail -1)
     PG_BIN=/usr/lib/postgresql/${PG_VER}/bin
     PGDATA=/var/lib/postgresql/${PG_VER}/main
-    log "Detectado PostgreSQL v${PG_VER} | BIN=$PG_BIN | DATA=$PGDATA"
+    log "PostgreSQL v${PG_VER} | BIN=$PG_BIN | DATA=$PGDATA"
 }
 
 # =============================================
@@ -43,30 +41,42 @@ inicializar_cluster() {
 }
 
 # =============================================
-# Configurar acceso remoto
-# Ubuntu guarda pg_hba.conf en /etc/postgresql/{ver}/main/
-# no en $PGDATA, hay que buscarlo dinámicamente
+# Configurar acceso
+# Sobreescribimos pg_hba.conf directamente
+# (más fiable que sed en Ubuntu 24.04)
 # =============================================
 configurar_acceso() {
-    # Buscar el pg_hba.conf real
+    # Buscar el pg_hba.conf real (Ubuntu: /etc/postgresql/{ver}/main/)
     local HBA
     HBA=$(find /etc/postgresql -name "pg_hba.conf" 2>/dev/null | head -1)
     [ -z "$HBA" ] && HBA="$PGDATA/pg_hba.conf"
 
-    # Trust para conexiones locales (socket Unix) + md5 para remotas
-    sed -i 's/^local[[:space:]].*$/local all all trust/' "$HBA"
-    grep -q "host all all 0.0.0.0/0 md5" "$HBA" \
-        || echo "host all all 0.0.0.0/0 md5" >> "$HBA"
+    log "Configurando $HBA ..."
 
-    # Buscar el postgresql.conf real
+    # Sobreescribir con config limpia: trust local + md5 remoto
+    cat > "$HBA" << 'EOF'
+# TYPE  DATABASE  USER  ADDRESS          METHOD
+local   all       all                    trust
+host    all       all   0.0.0.0/0        md5
+host    all       all   ::1/128          md5
+EOF
+
+    # Crear pg_ident.conf vacío si no existe (evita el warning)
+    local IDENT
+    IDENT=$(find /etc/postgresql -name "pg_ident.conf" 2>/dev/null | head -1)
+    [ -z "$IDENT" ] && touch "$PGDATA/pg_ident.conf"
+
+    # Buscar el postgresql.conf real y configurar escucha/puerto
     local CONF
     CONF=$(find /etc/postgresql -name "postgresql.conf" 2>/dev/null | head -1)
     [ -z "$CONF" ] && CONF="$PGDATA/postgresql.conf"
 
-    grep -q "^listen_addresses" "$CONF" || echo "listen_addresses='*'" >> "$CONF"
-    grep -q "^port"             "$CONF" || echo "port=$PG_PORT"         >> "$CONF"
+    grep -q "^listen_addresses" "$CONF" \
+        || echo "listen_addresses='*'" >> "$CONF"
+    grep -q "^port" "$CONF" \
+        || echo "port=$PG_PORT"         >> "$CONF"
 
-    log "Acceso remoto configurado (puerto $PG_PORT). HBA: $HBA"
+    log "Acceso configurado. HBA: $HBA | CONF: $CONF"
 }
 
 # =============================================
