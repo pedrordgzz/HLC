@@ -10,10 +10,23 @@ log() {
 
 # =============================================
 # Llama al entrypoint de ciber en segundo plano
-# (usuarios, ssh, etc.)
+# REPORT_FILE necesario para ciber/start.sh
 # =============================================
 load_entrypoint_ciber() {
+    export REPORT_FILE="${REPORT_FILE:-/dev/null}"
     bash /root/admin/ciber/start.sh &
+}
+
+# =============================================
+# Detectar variables de PostgreSQL en tiempo real
+# (Ubuntu pone las libs en /usr/lib/postgresql/{ver}/)
+# =============================================
+detect_pg_vars() {
+    local PG_VER
+    PG_VER=$(ls /usr/lib/postgresql/ | sort -V | tail -1)
+    PG_BIN=/usr/lib/postgresql/${PG_VER}/bin
+    PGDATA=/var/lib/postgresql/${PG_VER}/main
+    log "Detectado PostgreSQL v${PG_VER} | BIN=$PG_BIN | DATA=$PGDATA"
 }
 
 # =============================================
@@ -31,12 +44,29 @@ inicializar_cluster() {
 
 # =============================================
 # Configurar acceso remoto
+# Ubuntu guarda pg_hba.conf en /etc/postgresql/{ver}/main/
+# no en $PGDATA, hay que buscarlo dinámicamente
 # =============================================
 configurar_acceso() {
-    echo "host all all 0.0.0.0/0 md5"   >> "$PGDATA/pg_hba.conf"
-    echo "listen_addresses='*'"           >> "$PGDATA/postgresql.conf"
-    echo "port=$PG_PORT"                  >> "$PGDATA/postgresql.conf"
-    log "Acceso remoto configurado (puerto $PG_PORT)."
+    # Buscar el pg_hba.conf real
+    local HBA
+    HBA=$(find /etc/postgresql -name "pg_hba.conf" 2>/dev/null | head -1)
+    [ -z "$HBA" ] && HBA="$PGDATA/pg_hba.conf"
+
+    # Trust para conexiones locales (socket Unix) + md5 para remotas
+    sed -i 's/^local[[:space:]].*$/local all all trust/' "$HBA"
+    grep -q "host all all 0.0.0.0/0 md5" "$HBA" \
+        || echo "host all all 0.0.0.0/0 md5" >> "$HBA"
+
+    # Buscar el postgresql.conf real
+    local CONF
+    CONF=$(find /etc/postgresql -name "postgresql.conf" 2>/dev/null | head -1)
+    [ -z "$CONF" ] && CONF="$PGDATA/postgresql.conf"
+
+    grep -q "^listen_addresses" "$CONF" || echo "listen_addresses='*'" >> "$CONF"
+    grep -q "^port"             "$CONF" || echo "port=$PG_PORT"         >> "$CONF"
+
+    log "Acceso remoto configurado (puerto $PG_PORT). HBA: $HBA"
 }
 
 # =============================================
@@ -75,6 +105,7 @@ main() {
     log "Usuario: $PG_USER | BD: $PG_DATABASE | Puerto: $PG_PORT"
 
     load_entrypoint_ciber
+    detect_pg_vars
     inicializar_cluster
     configurar_acceso
     crear_usuario_y_bd
