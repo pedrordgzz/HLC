@@ -1,0 +1,28 @@
+services:
+  postgres:
+    build:
+      context: ${CONTEXTO}
+      dockerfile: ./dockerfiles/sgbd/Postgres/Dockerfile
+    image: peedroorgzz/postgres
+    container_name: ${NOMBRE}
+    ports:
+      - "${PG_PORT}:${PG_PORT}"
+      - "${PORT_SSH}:${PORT_SSH}"
+    env_file:
+      - ./.env
+    volumes:
+      - pgdata:/var/lib/postgresql       # Persistencia de datos
+      - ./logs:/var/log/postgres          # Logs del contenedor
+    networks:
+      netcaronte:
+        ipv4_address: ${IP}
+
+volumes:
+  pgdata:
+
+networks:
+  netcaronte:
+    ipam:
+      driver: default
+      config:
+        - subnet: ${SUBNET}
