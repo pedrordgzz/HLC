@@ -5,10 +5,7 @@ node_modules/
 dist/
 artifacts/
 
-# env
-.env
-.env.*
-!.env.example
+
 
 # logs
 logs/
