@@ -35,7 +35,7 @@ RUN rm -rf /var/www/html/*
 COPY --from=builder /app/dist /var/www/html/
 
 # Configuración de Nginx para SPA React
-COPY nginx/default.conf /etc/nginx/sites-available/default
+COPY nginx/default.conf /etc/nginx/conf.d/default.conf
 
 # Permisos
 RUN chown -R www-data:www-data /var/www/html

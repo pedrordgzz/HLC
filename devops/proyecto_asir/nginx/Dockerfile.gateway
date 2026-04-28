@@ -4,7 +4,7 @@ USER root
 ENTRYPOINT []
 
 # Copiar configuración del reverse proxy
-COPY nginx/gateway.conf /etc/nginx/sites-available/default
+COPY nginx/gateway.conf /etc/nginx/conf.d/default.conf
 
 EXPOSE 80
 
