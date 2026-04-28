@@ -1,0 +1,33 @@
+# ═══════════════════════════════════════════════════════════
+#  Playbook: Desplegar microservicio de auth en sistemas
+#  ya existentes (instalación nativa con systemd)
+#
+#  Uso:
+#    # Desplegar auth-service (librería completa):
+#    ansible-playbook -i inventory.ini deploy-microservicio.yml
+#
+#    # Desplegar auth-service-lista-cerrada:
+#    ansible-playbook -i inventory.ini deploy-microservicio.yml -e "servicio=auth-service-lista-cerrada servicio_puerto=5003"
+# ═══════════════════════════════════════════════════════════
+---
+- name: Desplegar microservicio de autenticación en sistemas existentes
+  hosts: clientes
+  become: true
+
+  vars:
+    # Configurable: qué servicio desplegar
+    servicio: auth-service
+    servicio_puerto: 5000
+    install_path: /opt/petstore/{{ servicio }}
+    service_user: petstore
+    env_file: /etc/petstore/{{ servicio }}.env
+
+    # Variables de entorno del microservicio
+    secret_key: "petstore_super_secret_key_123"
+    api_url: "http://{{ ansible_host }}"
+    frontend_url: "http://{{ ansible_host }}"
+    smtp_user: ""
+    smtp_pass: ""
+
+  roles:
+    - microservicio

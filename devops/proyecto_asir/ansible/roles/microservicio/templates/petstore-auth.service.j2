@@ -1,0 +1,27 @@
+[Unit]
+Description=PetStore {{ servicio }} - Microservicio de Autenticación
+Documentation=https://github.com/peedroorgzz/proyecto_asir
+After=network.target
+
+[Service]
+Type=exec
+User={{ service_user }}
+Group={{ service_user }}
+WorkingDirectory={{ install_path }}
+EnvironmentFile={{ env_file }}
+ExecStart={{ install_path }}/venv/bin/gunicorn --bind 0.0.0.0:{{ servicio_puerto }} --workers {{ gunicorn_workers }} app:app
+Restart=always
+RestartSec=5
+
+# Seguridad
+NoNewPrivileges=true
+ProtectSystem=strict
+ReadWritePaths={{ install_path }}
+
+# Logs
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=petstore-{{ servicio }}
+
+[Install]
+WantedBy=multi-user.target

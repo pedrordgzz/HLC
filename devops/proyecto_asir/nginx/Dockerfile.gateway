@@ -1,0 +1,11 @@
+FROM peedroorgzz/nginx
+USER root
+# Resetear ENTRYPOINT heredado (su start.sh arranca SSH y acaba con tail -f)
+ENTRYPOINT []
+
+# Copiar configuración del reverse proxy
+COPY nginx/gateway.conf /etc/nginx/sites-available/default
+
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]

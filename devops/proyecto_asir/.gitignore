@@ -1,0 +1,27 @@
+# === Dependencias ===
+node_modules/
+venv/
+
+# === Build ===
+dist/
+build/
+
+# === Python ===
+__pycache__/
+*.pyc
+*.pyo
+
+# === Bases de datos locales ===
+*.db
+
+# === Entorno ===
+.env
+.env.local
+
+# === IDE ===
+.vscode/
+.idea/
+
+# === OS ===
+.DS_Store
+Thumbs.db

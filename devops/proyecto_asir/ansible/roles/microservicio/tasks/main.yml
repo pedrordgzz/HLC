@@ -1,0 +1,132 @@
+# ═══════════════════════════════════════════════════════════
+#  Rol: Instalación nativa del microservicio de auth
+#  Compatible con auth-service y auth-service-lista-cerrada
+# ═══════════════════════════════════════════════════════════
+---
+# ── 1. Instalar dependencias del sistema ──
+- name: Instalar Python3 y dependencias
+  apt:
+    name:
+      - python3
+      - python3-pip
+      - python3-venv
+    state: present
+    update_cache: true
+
+# ── 2. Crear usuario de servicio ──
+- name: Crear usuario del servicio (sin login)
+  user:
+    name: "{{ service_user }}"
+    system: true
+    shell: /usr/sbin/nologin
+    create_home: false
+
+# ── 3. Crear directorios ──
+- name: Crear directorio de instalación
+  file:
+    path: "{{ install_path }}"
+    state: directory
+    owner: "{{ service_user }}"
+    group: "{{ service_user }}"
+    mode: '0755'
+
+- name: Crear directorio de configuración
+  file:
+    path: /etc/petstore
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+# ── 4. Copiar archivos del microservicio ──
+- name: Copiar archivos del microservicio al servidor
+  synchronize:
+    src: "{{ playbook_dir }}/../{{ servicio }}/"
+    dest: "{{ install_path }}/"
+    delete: true
+    rsync_opts:
+      - "--exclude=venv"
+      - "--exclude=__pycache__"
+      - "--exclude=*.db"
+      - "--exclude=.git"
+      - "--exclude=Dockerfile"
+
+# ── 5. Crear virtualenv e instalar dependencias ──
+- name: Crear virtualenv
+  command: python3 -m venv {{ install_path }}/venv
+  args:
+    creates: "{{ install_path }}/venv/bin/activate"
+
+- name: Instalar dependencias Python + Gunicorn
+  pip:
+    requirements: "{{ install_path }}/requirements.txt"
+    virtualenv: "{{ install_path }}/venv"
+    extra_args: "--no-cache-dir"
+
+- name: Instalar Gunicorn en el virtualenv
+  pip:
+    name: gunicorn
+    virtualenv: "{{ install_path }}/venv"
+
+# ── 6. Configurar variables de entorno ──
+- name: Crear archivo de variables de entorno
+  template:
+    src: auth.env.j2
+    dest: "{{ env_file }}"
+    owner: root
+    group: "{{ service_user }}"
+    mode: '0640'
+  notify: Reiniciar microservicio
+
+# ── 7. Asignar permisos ──
+- name: Asignar propiedad al usuario del servicio
+  file:
+    path: "{{ install_path }}"
+    state: directory
+    owner: "{{ service_user }}"
+    group: "{{ service_user }}"
+    recurse: true
+
+# ── 8. Crear servicio systemd ──
+- name: Crear archivo de servicio systemd
+  template:
+    src: petstore-auth.service.j2
+    dest: /etc/systemd/system/petstore-{{ servicio }}.service
+    owner: root
+    group: root
+    mode: '0644'
+  notify:
+    - Recargar systemd
+    - Reiniciar microservicio
+
+# ── 9. Habilitar y arrancar el servicio ──
+- name: Habilitar el servicio para arranque automático
+  systemd:
+    name: petstore-{{ servicio }}
+    enabled: true
+    state: started
+    daemon_reload: true
+
+# ── 10. Verificar que el servicio responde ──
+- name: Esperar a que el servicio esté disponible
+  uri:
+    url: "http://localhost:{{ servicio_puerto }}/api/auth/login"
+    method: POST
+    body_format: json
+    body: '{"email":"test@test.com","password":"test"}'
+    status_code: [400, 401]
+  register: service_check
+  retries: 5
+  delay: 3
+  until: service_check.status is defined
+
+- name: Mostrar estado del despliegue
+  debug:
+    msg: |
+      ═══════════════════════════════════════════
+       Microservicio {{ servicio }} desplegado
+       Puerto: {{ servicio_puerto }}
+       Ruta: {{ install_path }}
+       Servicio: petstore-{{ servicio }}.service
+       Estado: ACTIVO ✅
+      ═══════════════════════════════════════════

@@ -1,0 +1,15 @@
+# Variables por defecto del rol microservicio
+---
+servicio: auth-service
+servicio_puerto: 5000
+install_path: /opt/petstore/{{ servicio }}
+service_user: petstore
+env_file: /etc/petstore/{{ servicio }}.env
+gunicorn_workers: 2
+
+# Variables de entorno del servicio
+secret_key: "petstore_super_secret_key_123"
+api_url: "http://localhost"
+frontend_url: "http://localhost"
+smtp_user: ""
+smtp_pass: ""

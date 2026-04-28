@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro - LISTA CERRADA</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f8f9fa; }
+        .card-register {
+            max-width: 450px;
+            margin: 50px auto;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card card-register border-0">
+            <div class="card-header bg-success text-white text-center py-3" style="border-radius: 10px 10px 0 0;">
+                <h4 class="mb-0">Web LISTA CERRADA</h4>
+                <small>Validación Estricta de Dominios</small>
+            </div>
+            <div class="card-body p-4">
+                
+                {% if message %}
+                  <div class="alert alert-{{ message_type }}">
+                    {{ message }}
+                  </div>
+                {% endif %}
+
+                <!-- action="" hace POST a la URL actual del navegador (compatible con proxy inverso) -->
+                <form method="POST" action="">
+                    <div class="mb-3">
+                        <label for="nombre" class="form-label">Nombre</label>
+                        <input type="text" class="form-control" id="nombre" name="nombre" value="Demo User" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Correo Electrónico</label>
+                        <input type="email" class="form-control" id="email" name="email" placeholder="ejemplo@gmail.com" required>
+                        <div class="form-text mt-2">
+                            <strong>Sólo se admiten:</strong> 
+                            <span class="text-muted" style="font-size: 0.9em;">
+                                {{ allowed_domains | join(', ') }}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <label for="password" class="form-label">Contraseña</label>
+                        <input type="password" class="form-control" id="password" name="password" value="123456" required>
+                    </div>
+                    <button type="submit" class="btn btn-success w-100 fw-bold">Simular Registro</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

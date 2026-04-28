@@ -1,0 +1,10 @@
+# Handlers del rol microservicio
+---
+- name: Recargar systemd
+  systemd:
+    daemon_reload: true
+
+- name: Reiniciar microservicio
+  systemd:
+    name: petstore-{{ servicio }}
+    state: restarted

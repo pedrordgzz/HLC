@@ -1,0 +1,89 @@
+# ═══════════════════════════════════════════════════════════
+#  PetStore - Docker Compose
+#  Orquestación de todos los microservicios + demos
+#  Patrón gateway idéntico al global-deploy de HLC/Caronte
+# ═══════════════════════════════════════════════════════════
+
+services:
+  # ── Gateway (Reverse Proxy) ──
+  gateway:
+    build:
+      context: .
+      dockerfile: nginx/Dockerfile.gateway
+    container_name: petstore_gateway
+    ports:
+      - "80:80"
+    depends_on:
+      - frontend
+      - auth-service
+      - auth-service-lista-cerrada
+      - products-service
+      - web-sin-validacion
+      - web-lista-cerrada
+    networks:
+      - petstore_network
+    restart: unless-stopped
+
+  # ── Frontend (React + Vite → Nginx) ──
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        VITE_AUTH_API_URL: /api/auth
+        VITE_PRODUCTS_API_URL: /api/products
+    container_name: petstore_frontend
+    networks:
+      - petstore_network
+    restart: unless-stopped
+
+  # ── Auth Service (Validación con librería completa) ──
+  auth-service:
+    build: ./auth-service
+    container_name: petstore_auth
+    environment:
+      - SECRET_KEY=${SECRET_KEY:-petstore_super_secret_key_123}
+      - API_URL=${API_URL:-http://localhost}
+      - FRONTEND_URL=${FRONTEND_URL:-http://localhost}
+      - SMTP_USER=${SMTP_USER:-}
+      - SMTP_PASS=${SMTP_PASS:-}
+    networks:
+      - petstore_network
+    restart: unless-stopped
+
+  # ── Auth Service Lista Cerrada (Validación con whitelist) ──
+  auth-service-lista-cerrada:
+    build: ./auth-service-lista-cerrada
+    container_name: petstore_auth_lista
+    environment:
+      - SECRET_KEY=${SECRET_KEY:-petstore_super_secret_key_123}
+    networks:
+      - petstore_network
+    restart: unless-stopped
+
+  # ── Products Service ──
+  products-service:
+    build: ./products-service
+    container_name: petstore_products
+    networks:
+      - petstore_network
+    restart: unless-stopped
+
+  # ── Demo: Web Sin Validación ──
+  web-sin-validacion:
+    build: ./web-sin-validacion
+    container_name: petstore_sin_validacion
+    networks:
+      - petstore_network
+    restart: unless-stopped
+
+  # ── Demo: Web Lista Cerrada ──
+  web-lista-cerrada:
+    build: ./web-lista-cerrada
+    container_name: petstore_lista_cerrada
+    networks:
+      - petstore_network
+    restart: unless-stopped
+
+networks:
+  petstore_network:
+    driver: bridge
