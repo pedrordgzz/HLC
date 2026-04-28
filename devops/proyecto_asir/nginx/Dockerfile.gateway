@@ -6,6 +6,9 @@ ENTRYPOINT []
 # Limpiar cualquier configuración por defecto que traiga la imagen base
 RUN rm -rf /etc/nginx/conf.d/* /etc/nginx/sites-enabled/* /etc/nginx/sites-available/* /var/www/html/*
 
+# Copiar nuestra configuración maestra de Nginx
+COPY nginx/nginx.conf /etc/nginx/nginx.conf
+
 # Copiar configuración del reverse proxy
 COPY nginx/gateway.conf /etc/nginx/conf.d/petstore.conf
 

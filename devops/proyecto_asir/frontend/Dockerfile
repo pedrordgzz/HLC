@@ -37,6 +37,9 @@ COPY --from=builder /app/dist /var/www/html/
 # Limpiar cualquier configuración por defecto
 RUN rm -rf /etc/nginx/conf.d/* /etc/nginx/sites-enabled/* /etc/nginx/sites-available/*
 
+# Copiar configuración maestra de Nginx
+COPY nginx/nginx.conf /etc/nginx/nginx.conf
+
 # Configuración de Nginx para SPA React
 COPY nginx/default.conf /etc/nginx/conf.d/petstore.conf
 
