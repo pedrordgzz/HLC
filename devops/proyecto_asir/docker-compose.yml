@@ -46,6 +46,8 @@ services:
       - FRONTEND_URL=${FRONTEND_URL:-http://localhost}
       - SMTP_USER=${SMTP_USER:-}
       - SMTP_PASS=${SMTP_PASS:-}
+    volumes:
+      - auth_data:/opt/petstore/auth-service/data
     networks:
       - petstore_network
     restart: unless-stopped
@@ -56,6 +58,8 @@ services:
     container_name: petstore_auth_lista
     environment:
       - SECRET_KEY=${SECRET_KEY:-petstore_super_secret_key_123}
+    volumes:
+      - auth_lista_data:/opt/petstore/auth-service-lista-cerrada/data
     networks:
       - petstore_network
     restart: unless-stopped
@@ -64,6 +68,8 @@ services:
   products-service:
     build: ./products-service
     container_name: petstore_products
+    volumes:
+      - products_data:/opt/petstore/products-service/data
     networks:
       - petstore_network
     restart: unless-stopped
@@ -87,3 +93,8 @@ services:
 networks:
   petstore_network:
     driver: bridge
+
+volumes:
+  auth_data:
+  auth_lista_data:
+  products_data:

@@ -16,17 +16,17 @@ from disposable_email_domains import blocklist
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadTimeSignature
 
 app = Flask(__name__)
-# Enable CORS so the React frontend can talk to this service
 CORS(app)
 
-# We would normally keep this secret in an environment variable
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'petstore_super_secret_key_123')
-DB_FILE = 'users.db'
+
+os.makedirs('data', exist_ok=True)
+DB_FILE = 'data/users.db'
 CUSTOM_BLOCKLIST_FILE = 'custom_blocklist.txt'
 
-# URLs configurables para despliegue (en local usan localhost por defecto)
 API_URL = os.environ.get('API_URL', 'http://localhost:5000')
 FRONTEND_URL = os.environ.get('FRONTEND_URL', 'http://localhost:3000')
+
 
 def get_custom_blocklist():
     if not os.path.exists(CUSTOM_BLOCKLIST_FILE):
@@ -34,8 +34,26 @@ def get_custom_blocklist():
     with open(CUSTOM_BLOCKLIST_FILE, 'r', encoding='utf-8') as f:
         return set(line.strip().lower() for line in f if line.strip() and not line.startswith('#'))
 
+
+def get_client_ip():
+    return request.headers.get('X-Real-IP', request.remote_addr)
+
+
+def log_attempt(email, ip, result, message):
+    try:
+        conn = sqlite3.connect(DB_FILE)
+        c = conn.cursor()
+        c.execute(
+            'INSERT INTO validation_logs (timestamp, email, ip, result, message) VALUES (?, ?, ?, ?, ?)',
+            (datetime.datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S'), email, ip, result, message)
+        )
+        conn.commit()
+        conn.close()
+    except Exception:
+        pass
+
+
 def init_db():
-    """Initializes the SQLite database from scratch if it doesn't exist."""
     conn = sqlite3.connect(DB_FILE)
     c = conn.cursor()
     c.execute('''
@@ -49,78 +67,76 @@ def init_db():
             is_verified INTEGER DEFAULT 0
         )
     ''')
-    # If the database already exists, attempt to add the is_verified column
     try:
         c.execute("ALTER TABLE users ADD COLUMN is_verified INTEGER DEFAULT 0")
     except sqlite3.OperationalError:
-        # Expected error if the column already exists
         pass
+    c.execute('''
+        CREATE TABLE IF NOT EXISTS validation_logs (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            timestamp TEXT NOT NULL,
+            email TEXT NOT NULL,
+            ip TEXT,
+            result TEXT NOT NULL,
+            message TEXT
+        )
+    ''')
     conn.commit()
     conn.close()
 
-# Initialize the db on startup
+
 init_db()
 
 
 def send_verification_email(user_email, token):
-    """
-    Envía un correo con el link o lo imprime en consola si no hay credenciales SMTP.
-    """
     verification_link = f"{API_URL}/api/auth/verify/{token}"
-    
-    # 1. Simulación en Consola (Muy útil para ver el flujo en local sin configurar cuentas)
-    print(f"\n{'='*60}\n[SIMULACIÓN DE ENVÍO DE CORREO]\nPara: {user_email}\nAsunto: Verifica tu cuenta en PetStore\n\nPor favor, verifica tu cuenta haciendo click en el siguiente enlace:\n{verification_link}\n{'='*60}\n")
-    
-    # 2. Envío de Correo Real (Requiere configurar SMTP_USER y SMTP_PASS en el sistema operativo)
+    print(f"\n{'='*60}\n[SIMULACIÓN DE ENVÍO DE CORREO]\nPara: {user_email}\nLink: {verification_link}\n{'='*60}\n")
+
     sender_email = os.environ.get('SMTP_USER')
     sender_password = os.environ.get('SMTP_PASS')
-    
+
     if sender_email and sender_password:
         try:
             msg = MIMEMultipart()
             msg['From'] = 'PetStore <no-reply@petstore.local>'
             msg['To'] = user_email
             msg['Subject'] = 'Verifica tu cuenta en PetStore'
-            
-            body = f"Hola,\n\nGracias por registrarte en PetStore. Por favor, verifica tu cuenta haciendo click en este enlace:\n{verification_link}\n\nSi no fuiste tú, puedes ignorar este correo."
+            body = f"Hola,\n\nVerifica tu cuenta haciendo click aquí:\n{verification_link}\n\nSi no fuiste tú, ignora este correo."
             msg.attach(MIMEText(body, 'plain'))
-            
-            # Usando el servidor de Gmail como ejemplo por defecto
             server = smtplib.SMTP('smtp.gmail.com', 587)
             server.starttls()
             server.login(sender_email, sender_password)
             server.sendmail(sender_email, user_email, msg.as_string())
             server.quit()
         except Exception as e:
-            print(f"Error enviando correo real por SMTP: {str(e)}")
+            print(f"Error enviando correo: {str(e)}")
 
 
 @app.route('/api/auth/register', methods=['POST'])
 def register():
-    data = request.get_json()
-    if not data:
+    request_data = request.get_json()
+    if not request_data:
         return jsonify({'success': False, 'message': 'Datos inválidos.'}), 400
 
-    nombre = data.get('nombre')
-    apellido = data.get('apellido')
-    email = data.get('email')
-    telefono = data.get('telefono')
-    password = data.get('password')
+    nombre = request_data.get('nombre')
+    apellido = request_data.get('apellido')
+    email = request_data.get('email', '')
+    telefono = request_data.get('telefono')
+    password = request_data.get('password')
+    ip = get_client_ip()
 
     if not all([nombre, apellido, email, telefono, password]):
         return jsonify({'success': False, 'message': 'Todos los campos son obligatorios.'}), 400
 
-    # 1. VALIDATE EMAIL DOMAIN (MX RECORDS & FORMAT AND TEMPORAL LISTS)
+    # 1. VALIDAR FORMATO Y REGISTROS MX
     try:
-        # validate_email performs format check and MX record check (deliverability)
         valid = validate_email(email, check_deliverability=True)
         email = valid.normalized
-        
-        # Get domain part in lowercase
+
         parts = email.split('@')
         domain = parts[1].lower() if len(parts) > 1 else ""
-        
-        # Robust check against local pip blocklist (fast fail)
+
+        # 2. COMPROBAR LISTA NEGRA LOCAL (pip: disposable-email-domains)
         is_disposable = False
         domain_parts = domain.split('.')
         for i in range(len(domain_parts) - 1):
@@ -128,52 +144,57 @@ def register():
             if check_domain in blocklist:
                 is_disposable = True
                 break
-                
-        # API Check against Debounce (Catch dynamic temp emails)
+
+        # 3. COMPROBAR API DEBOUNCE (correos temporales dinámicos)
         if not is_disposable:
             try:
                 debounce_resp = requests.get(
-                    f'https://disposable.debounce.io/?email={email}', 
+                    f'https://disposable.debounce.io/?email={email}',
                     headers={'User-Agent': 'Mozilla/5.0'},
                     timeout=5
                 )
                 if debounce_resp.status_code == 200:
-                    data = debounce_resp.json()
-                    if data.get('disposable') == 'true':
+                    debounce_data = debounce_resp.json()
+                    if debounce_data.get('disposable') == 'true':
                         is_disposable = True
             except requests.RequestException:
-                pass # Silently proceed if API is down to avoid blocking legit users
-        
+                pass
+
         if is_disposable:
-            return jsonify({'success': False, 'message': 'No se permiten proveedores de correo temporal o desechable.'}), 400
-            
+            msg = 'No se permiten proveedores de correo temporal o desechable.'
+            log_attempt(email, ip, 'blocked_disposable', msg)
+            return jsonify({'success': False, 'message': msg}), 400
+
     except EmailNotValidError as e:
-        return jsonify({'success': False, 'message': f"Email inválido: {str(e)}"}), 400
+        msg = f"Email inválido: {str(e)}"
+        log_attempt(email, ip, 'blocked_format', msg)
+        return jsonify({'success': False, 'message': msg}), 400
 
-    # 2. HASH PASSWORD
+    # 4. GUARDAR EN BD
     hashed_password = generate_password_hash(password)
-
-    # 3. SAVE TO DB (WITH VERIFIED=0)
     try:
         conn = sqlite3.connect(DB_FILE)
         c = conn.cursor()
-        c.execute('''
-            INSERT INTO users (nombre, apellido, email, telefono, password, is_verified) 
-            VALUES (?, ?, ?, ?, ?, 0)
-        ''', (nombre, apellido, email, telefono, hashed_password))
+        c.execute(
+            'INSERT INTO users (nombre, apellido, email, telefono, password, is_verified) VALUES (?, ?, ?, ?, ?, 0)',
+            (nombre, apellido, email, telefono, hashed_password)
+        )
         conn.commit()
     except sqlite3.IntegrityError:
-        return jsonify({'success': False, 'message': 'Ese correo ya está registrado.'}), 409
+        conn.close()
+        msg = 'Ese correo ya está registrado.'
+        log_attempt(email, ip, 'duplicate', msg)
+        return jsonify({'success': False, 'message': msg}), 409
     finally:
         conn.close()
 
-    # 4. GENERATE VERIFICATION TOKEN
+    # 5. TOKEN DE VERIFICACIÓN Y EMAIL
     serializer = URLSafeTimedSerializer(app.config['SECRET_KEY'])
     token = serializer.dumps(email, salt='email-verification')
-    
-    # 5. SEND EMAIL IN BACKGROUND THREAD
     threading.Thread(target=send_verification_email, args=(email, token)).start()
 
+    msg = '¡Cuenta creada! Revisa tu correo para verificar tu cuenta.'
+    log_attempt(email, ip, 'success', msg)
     return jsonify({'success': True, 'message': '¡Cuenta creada! Por favor, revisa tu correo electrónico para verificar tu cuenta antes de iniciar sesión.'}), 201
 
 
@@ -181,35 +202,28 @@ def register():
 def verify_email(token):
     serializer = URLSafeTimedSerializer(app.config['SECRET_KEY'])
     try:
-        # El token tiene validez de máximo 1 hora (3600 segundos)
         email = serializer.loads(token, salt='email-verification', max_age=3600)
     except SignatureExpired:
-        return "<h1>Error: El enlace de verificación ha expirado. Deberás volver a registrarte.</h1>", 400
+        return "<h1>Error: El enlace de verificación ha expirado.</h1>", 400
     except BadTimeSignature:
-        return "<h1>Error: Enlace de verificación inválido o corrupto.</h1>", 400
-        
+        return "<h1>Error: Enlace de verificación inválido.</h1>", 400
+
     conn = sqlite3.connect(DB_FILE)
     c = conn.cursor()
     c.execute("UPDATE users SET is_verified = 1 WHERE email = ?", (email,))
     conn.commit()
     conn.close()
-    
-    # Una vista simple que te redirige amablemente al Frontend local
+
     return f"""
     <html>
-        <head>
-            <meta charset="UTF-8">
-            <title>Cuenta Verificada</title>
-        </head>
-        <body style="font-family: Arial, sans-serif; text-align: center; padding: 50px; background-color: #f7f7f7;">
-            <div style="background: white; max-width: 500px; margin: auto; padding: 30px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-                <h1 style="color: #4CAF50; font-size: 24px;">¡Felicidades!</h1>
-                <p style="font-size: 16px; color: #555;">Tu cuenta de PetStore ha sido verificada correctamente.</p>
-                <div style="margin-top: 30px;">
-                    <a href="{FRONTEND_URL}/login" style="display: inline-block; padding: 12px 24px; background-color: #007BFF; color: white; text-decoration: none; border-radius: 5px; font-weight: bold;">
-                        Ir a Iniciar Sesión
-                    </a>
-                </div>
+        <head><meta charset="UTF-8"><title>Cuenta Verificada</title></head>
+        <body style="font-family: Arial, sans-serif; text-align: center; padding: 50px; background-color: #0f172a; color: #f8fafc;">
+            <div style="background: #1e293b; max-width: 500px; margin: auto; padding: 30px; border-radius: 12px;">
+                <h1 style="color: #4ade80;">¡Cuenta Verificada!</h1>
+                <p style="color: #94a3b8;">Tu cuenta de PetStore ha sido verificada correctamente.</p>
+                <a href="{FRONTEND_URL}/login" style="display:inline-block; margin-top:20px; padding:12px 24px; background:#f97316; color:white; border-radius:8px; text-decoration:none; font-weight:bold;">
+                    Ir a Iniciar Sesión
+                </a>
             </div>
         </body>
     </html>
@@ -218,12 +232,12 @@ def verify_email(token):
 
 @app.route('/api/auth/login', methods=['POST'])
 def login():
-    data = request.get_json()
-    if not data:
+    request_data = request.get_json()
+    if not request_data:
         return jsonify({'success': False, 'message': 'Faltan credenciales.'}), 400
 
-    email = data.get('email')
-    password = data.get('password')
+    email = request_data.get('email')
+    password = request_data.get('password')
 
     conn = sqlite3.connect(DB_FILE)
     conn.row_factory = sqlite3.Row
@@ -233,12 +247,9 @@ def login():
     conn.close()
 
     if user and check_password_hash(user['password'], password):
-        
-        # Bloqueo: si la cuenta no fue verificada, no entra.
         if not user['is_verified']:
-            return jsonify({'success': False, 'message': 'Debes verificar tu correo electrónico antes de poder iniciar sesión. Revisa tu bandeja de entrada o ejecuta la consola de Auth.'}), 403
+            return jsonify({'success': False, 'message': 'Debes verificar tu correo electrónico antes de iniciar sesión.'}), 403
 
-        # Generar Token JWT
         token_expiration = datetime.datetime.utcnow() + datetime.timedelta(hours=24)
         token_payload = {
             'user_id': user['id'],
@@ -254,17 +265,52 @@ def login():
             'email': user['email'],
             'telefono': user['telefono']
         }
-        
-        return jsonify({
-            'success': True, 
-            'message': f'¡Bienvenido de nuevo, {user["nombre"]}!',
-            'token': token,
-            'user': user_data
-        }), 200
+        return jsonify({'success': True, 'message': f'¡Bienvenido de nuevo, {user["nombre"]}!', 'token': token, 'user': user_data}), 200
 
     return jsonify({'success': False, 'message': 'Correo o contraseña incorrectos.'}), 401
 
 
+@app.route('/api/auth/logs', methods=['GET'])
+def get_logs():
+    limit = request.args.get('limit', 200, type=int)
+    conn = sqlite3.connect(DB_FILE)
+    conn.row_factory = sqlite3.Row
+    c = conn.cursor()
+    c.execute("SELECT * FROM validation_logs ORDER BY id DESC LIMIT ?", (limit,))
+    logs = [dict(row) for row in c.fetchall()]
+    conn.close()
+    return jsonify(logs)
+
+
+@app.route('/api/auth/stats', methods=['GET'])
+def get_stats():
+    conn = sqlite3.connect(DB_FILE)
+    c = conn.cursor()
+    c.execute("SELECT COUNT(*) FROM validation_logs")
+    total = c.fetchone()[0]
+    c.execute("SELECT result, COUNT(*) FROM validation_logs GROUP BY result")
+    by_result = {row[0]: row[1] for row in c.fetchall()}
+    conn.close()
+
+    success = by_result.get('success', 0)
+    blocked = (
+        by_result.get('blocked_disposable', 0) +
+        by_result.get('blocked_format', 0) +
+        by_result.get('blocked_mx', 0)
+    )
+    duplicates = by_result.get('duplicate', 0)
+    success_rate = round((success / total * 100), 1) if total > 0 else 0
+
+    return jsonify({
+        'total': total,
+        'success': success,
+        'blocked': blocked,
+        'duplicates': duplicates,
+        'success_rate': success_rate,
+        'by_result': by_result,
+        'service': 'auth-service-full'
+    })
+
+
 if __name__ == '__main__':
-    # Run service
     app.run(host='0.0.0.0', port=5000, debug=True)

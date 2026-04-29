@@ -38,6 +38,9 @@ function Navbar() {
           Pet<span>Store</span>
         </Link>
         <div className="nav-actions">
+          <Link to="/dashboard" className="btn btn-outline" style={{ fontSize: '0.9rem' }}>
+            Panel de Control
+          </Link>
           {currentUser ? (
             <>
               <span className="nav-user-greeting">

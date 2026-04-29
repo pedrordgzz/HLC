@@ -52,6 +52,29 @@ export const authService = {
   }
 };
 
+export const logsService = {
+
+  getStats: async (service = 'full') => {
+    const url = service === 'lista' ? '/api/auth-lista-cerrada/stats' : '/api/auth/stats'
+    try {
+      const res = await fetch(url)
+      return await res.json()
+    } catch {
+      return { total: 0, success: 0, blocked: 0, duplicates: 0, success_rate: 0, by_result: {} }
+    }
+  },
+
+  getLogs: async (service = 'full', limit = 200) => {
+    const base = service === 'lista' ? '/api/auth-lista-cerrada' : '/api/auth'
+    try {
+      const res = await fetch(`${base}/logs?limit=${limit}`)
+      return await res.json()
+    } catch {
+      return []
+    }
+  },
+}
+
 export const productsService = {
 
   getAll: async () => {

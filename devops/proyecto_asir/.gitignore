@@ -1,7 +1,7 @@
 # === Dependencias ===
 node_modules/
 venv/
-
+.claude
 # === Build ===
 dist/
 build/
