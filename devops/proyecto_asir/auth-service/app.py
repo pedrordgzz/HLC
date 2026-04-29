@@ -270,6 +270,46 @@ def login():
     return jsonify({'success': False, 'message': 'Correo o contraseña incorrectos.'}), 401
 
 
+@app.route('/api/auth/admin-login', methods=['POST'])
+def admin_login():
+    request_data = request.get_json()
+    if not request_data:
+        return jsonify({'success': False, 'message': 'Datos inválidos.'}), 400
+
+    username = request_data.get('username', '')
+    password = request_data.get('password', '')
+
+    admin_user = os.environ.get('ADMIN_USER', 'admin')
+    admin_pass = os.environ.get('ADMIN_PASS', 'admin1234')
+
+    if username != admin_user or password != admin_pass:
+        return jsonify({'success': False, 'message': 'Credenciales incorrectas.'}), 401
+
+    token_payload = {
+        'role': 'admin',
+        'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=8)
+    }
+    token = jwt.encode(token_payload, app.config['SECRET_KEY'], algorithm='HS256')
+    return jsonify({'success': True, 'token': token}), 200
+
+
+@app.route('/api/auth/admin-verify', methods=['GET'])
+def admin_verify():
+    auth_header = request.headers.get('Authorization', '')
+    if not auth_header.startswith('Bearer '):
+        return jsonify({'valid': False}), 401
+    token = auth_header.split(' ', 1)[1]
+    try:
+        payload = jwt.decode(token, app.config['SECRET_KEY'], algorithms=['HS256'])
+        if payload.get('role') != 'admin':
+            return jsonify({'valid': False}), 403
+        return jsonify({'valid': True}), 200
+    except jwt.ExpiredSignatureError:
+        return jsonify({'valid': False, 'message': 'Sesión expirada.'}), 401
+    except jwt.InvalidTokenError:
+        return jsonify({'valid': False, 'message': 'Token inválido.'}), 401
+
+
 @app.route('/api/auth/logs', methods=['GET'])
 def get_logs():
     limit = request.args.get('limit', 200, type=int)

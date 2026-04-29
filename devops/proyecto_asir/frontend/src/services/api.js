@@ -52,6 +52,45 @@ export const authService = {
   }
 };
 
+export const adminService = {
+
+  login: async (username, password) => {
+    try {
+      const res = await fetch(`${AUTH_API_URL}/admin-login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+      })
+      const data = await res.json()
+      if (data.success) {
+        sessionStorage.setItem('admin_token', data.token)
+      }
+      return data
+    } catch {
+      return { success: false, message: 'Error de conexión con el servidor.' }
+    }
+  },
+
+  verify: async () => {
+    const token = sessionStorage.getItem('admin_token')
+    if (!token) return false
+    try {
+      const res = await fetch(`${AUTH_API_URL}/admin-verify`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      })
+      const data = await res.json()
+      if (!data.valid) sessionStorage.removeItem('admin_token')
+      return data.valid === true
+    } catch {
+      return false
+    }
+  },
+
+  logout: () => {
+    sessionStorage.removeItem('admin_token')
+  },
+}
+
 export const logsService = {
 
   getStats: async (service = 'full') => {

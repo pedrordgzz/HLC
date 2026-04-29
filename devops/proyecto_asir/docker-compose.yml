@@ -46,6 +46,8 @@ services:
       - FRONTEND_URL=${FRONTEND_URL:-http://localhost}
       - SMTP_USER=${SMTP_USER:-}
       - SMTP_PASS=${SMTP_PASS:-}
+      - ADMIN_USER=${ADMIN_USER:-admin}
+      - ADMIN_PASS=${ADMIN_PASS:-admin1234}
     volumes:
       - auth_data:/opt/petstore/auth-service/data
     networks:
