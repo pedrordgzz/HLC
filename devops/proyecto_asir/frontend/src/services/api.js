@@ -93,23 +93,71 @@ export const adminService = {
 
 export const logsService = {
 
-  getStats: async (service = 'full') => {
-    const url = service === 'lista' ? '/api/auth-lista-cerrada/stats' : '/api/auth/stats'
+  getStats: async (service = 'full', type = null) => {
+    const base = service === 'lista' ? '/api/auth-lista-cerrada' : '/api/auth'
+    const qs = type ? `?type=${type}` : ''
     try {
-      const res = await fetch(url)
+      const res = await fetch(`${base}/stats${qs}`)
       return await res.json()
     } catch {
       return { total: 0, success: 0, blocked: 0, duplicates: 0, success_rate: 0, by_result: {} }
     }
   },
 
-  getLogs: async (service = 'full', limit = 200) => {
+  getLogs: async (service = 'full', limit = 200, type = null) => {
     const base = service === 'lista' ? '/api/auth-lista-cerrada' : '/api/auth'
+    const qs = type ? `?limit=${limit}&type=${type}` : `?limit=${limit}`
     try {
-      const res = await fetch(`${base}/logs?limit=${limit}`)
+      const res = await fetch(`${base}/logs${qs}`)
       return await res.json()
     } catch {
       return []
+    }
+  },
+}
+
+export const blocklistService = {
+
+  list: async () => {
+    const token = sessionStorage.getItem('admin_token')
+    try {
+      const res = await fetch(`${AUTH_API_URL}/blocklist`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      })
+      if (!res.ok) return []
+      return await res.json()
+    } catch {
+      return []
+    }
+  },
+
+  add: async (domain) => {
+    const token = sessionStorage.getItem('admin_token')
+    try {
+      const res = await fetch(`${AUTH_API_URL}/blocklist`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ domain })
+      })
+      return await res.json()
+    } catch {
+      return { success: false, message: 'Error de conexión.' }
+    }
+  },
+
+  remove: async (domain) => {
+    const token = sessionStorage.getItem('admin_token')
+    try {
+      const res = await fetch(`${AUTH_API_URL}/blocklist/${encodeURIComponent(domain)}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      })
+      return await res.json()
+    } catch {
+      return { success: false, message: 'Error de conexión.' }
     }
   },
 }

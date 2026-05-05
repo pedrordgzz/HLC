@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { logsService } from '../services/api'
+import { logsService, blocklistService } from '../services/api'
 
 const RESULT_CONFIG = {
   success:            { label: 'Éxito',                   cls: 'badge-success' },
@@ -7,6 +7,9 @@ const RESULT_CONFIG = {
   blocked_format:     { label: 'Formato inválido',        cls: 'badge-warning' },
   blocked_mx:         { label: 'Sin registros MX',        cls: 'badge-warning' },
   blocked_domain:     { label: 'Dominio no permitido',    cls: 'badge-danger'  },
+  blocked_custom:     { label: 'Bloqueado (custom)',      cls: 'badge-danger'  },
+  blocked_global:     { label: 'Bloqueado (global)',      cls: 'badge-danger'  },
+  blocked_premium:    { label: 'Tel. premium',            cls: 'badge-danger'  },
   duplicate:          { label: 'Duplicado',               cls: 'badge-info'    },
 }
 
@@ -35,6 +38,9 @@ function BarChart({ byResult }) {
     blocked_format:     '#fbbf24',
     blocked_mx:         '#fb923c',
     blocked_domain:     '#f87171',
+    blocked_custom:     '#ef4444',
+    blocked_global:     '#dc2626',
+    blocked_premium:    '#f87171',
     duplicate:          '#60a5fa',
   }
 
@@ -66,27 +72,126 @@ function BarChart({ byResult }) {
   )
 }
 
+function BlocklistManager() {
+  const [domains, setDomains] = useState([])
+  const [newDomain, setNewDomain] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [message, setMessage] = useState(null)
+
+  const refresh = async () => {
+    setLoading(true)
+    const list = await blocklistService.list()
+    setDomains(Array.isArray(list) ? list : [])
+    setLoading(false)
+  }
+
+  useEffect(() => { refresh() }, [])
+
+  const handleAdd = async (e) => {
+    e.preventDefault()
+    if (!newDomain.trim()) return
+    const result = await blocklistService.add(newDomain.trim())
+    setMessage(result.message || (result.success ? 'Añadido' : 'Error'))
+    setNewDomain('')
+    await refresh()
+    setTimeout(() => setMessage(null), 3000)
+  }
+
+  const handleRemove = async (domain) => {
+    if (!confirm(`¿Eliminar el dominio "${domain}" de la lista negra?`)) return
+    const result = await blocklistService.remove(domain)
+    setMessage(result.message || 'Eliminado')
+    await refresh()
+    setTimeout(() => setMessage(null), 3000)
+  }
+
+  return (
+    <div className="dashboard-section">
+      <h2 className="section-title">
+        Gestión de Blocklist Global
+        <span style={{ fontSize: '0.9rem', color: 'var(--text-muted)', fontWeight: 400, marginLeft: '0.7rem' }}>
+          (inteligencia colectiva — se sincroniza con los microservicios cliente)
+        </span>
+      </h2>
+
+      <form onSubmit={handleAdd} style={{ display: 'flex', gap: '0.6rem', marginBottom: '1rem', flexWrap: 'wrap' }}>
+        <input
+          type="text"
+          placeholder="ejemplo: dominio-malicioso.com"
+          value={newDomain}
+          onChange={e => setNewDomain(e.target.value)}
+          className="form-control"
+          style={{ flex: 1, minWidth: '220px' }}
+        />
+        <button type="submit" className="btn btn-primary">Añadir dominio</button>
+        <button type="button" className="btn btn-outline" onClick={refresh}>Recargar</button>
+      </form>
+
+      {message && (
+        <p style={{ color: 'var(--accent-primary)', fontSize: '0.9rem', marginBottom: '0.6rem' }}>{message}</p>
+      )}
+
+      <div className="logs-table-wrap">
+        <table className="logs-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Dominio</th>
+              <th style={{ textAlign: 'right' }}>Acción</th>
+            </tr>
+          </thead>
+          <tbody>
+            {loading ? (
+              <tr><td colSpan="3" style={{ textAlign: 'center', color: 'var(--text-muted)', padding: '1.5rem' }}>Cargando...</td></tr>
+            ) : domains.length === 0 ? (
+              <tr><td colSpan="3" style={{ textAlign: 'center', color: 'var(--text-muted)', padding: '1.5rem' }}>La lista negra está vacía.</td></tr>
+            ) : (
+              domains.map((d, i) => (
+                <tr key={d}>
+                  <td style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>{i + 1}</td>
+                  <td style={{ fontFamily: 'monospace' }}>{d}</td>
+                  <td style={{ textAlign: 'right' }}>
+                    <button
+                      onClick={() => handleRemove(d)}
+                      className="btn btn-outline"
+                      style={{ fontSize: '0.8rem', padding: '0.3rem 0.7rem' }}
+                    >
+                      Eliminar
+                    </button>
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  )
+}
+
 function Dashboard() {
   const [fullStats, setFullStats]   = useState(null)
   const [listaStats, setListaStats] = useState(null)
   const [fullLogs, setFullLogs]     = useState([])
   const [listaLogs, setListaLogs]   = useState([])
   const [activeTab, setActiveTab]   = useState('full')
+  const [activeType, setActiveType] = useState('all')  // all | email | phone
   const [search, setSearch]         = useState('')
   const [loading, setLoading]       = useState(true)
   const [lastUpdate, setLastUpdate] = useState(null)
 
   const fetchData = async () => {
+    const type = activeType === 'all' ? null : activeType
     const [fs, ls, fl, ll] = await Promise.all([
-      logsService.getStats('full'),
-      logsService.getStats('lista'),
-      logsService.getLogs('full'),
-      logsService.getLogs('lista'),
+      logsService.getStats('full', type),
+      logsService.getStats('lista', type),
+      logsService.getLogs('full', 200, type),
+      logsService.getLogs('lista', 200, type),
     ])
     setFullStats(fs)
     setListaStats(ls)
-    setFullLogs(fl)
-    setListaLogs(ll)
+    setFullLogs(Array.isArray(fl) ? fl : [])
+    setListaLogs(Array.isArray(ll) ? ll : [])
     setLastUpdate(new Date().toLocaleTimeString('es-ES'))
     setLoading(false)
   }
@@ -95,16 +200,20 @@ function Dashboard() {
     fetchData()
     const interval = setInterval(fetchData, 30000)
     return () => clearInterval(interval)
-  }, [])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeType])
 
   const currentStats = activeTab === 'full' ? fullStats : listaStats
   const currentLogs  = activeTab === 'full' ? fullLogs  : listaLogs
 
-  const filteredLogs = currentLogs.filter(log =>
-    log.email?.toLowerCase().includes(search.toLowerCase()) ||
-    log.result?.toLowerCase().includes(search.toLowerCase()) ||
-    log.ip?.includes(search)
-  )
+  const filteredLogs = currentLogs.filter(log => {
+    const target = log.target || log.email || ''
+    return (
+      target.toLowerCase().includes(search.toLowerCase()) ||
+      log.result?.toLowerCase().includes(search.toLowerCase()) ||
+      log.ip?.includes(search)
+    )
+  })
 
   if (loading) {
     return (
@@ -114,10 +223,11 @@ function Dashboard() {
     )
   }
 
+  const typeLabel = activeType === 'phone' ? 'Teléfonos' : activeType === 'email' ? 'Correos' : 'Total'
+
   return (
     <main className="container" style={{ paddingTop: '2rem', paddingBottom: '3rem' }}>
 
-      {/* Cabecera */}
       <div className="dashboard-header">
         <div>
           <h1 className="dashboard-title">Panel de Control</h1>
@@ -153,23 +263,48 @@ function Dashboard() {
         </button>
       </div>
 
+      {/* Selector de tipo: email / phone / all */}
+      <div className="tab-group" style={{ marginTop: '0.5rem' }}>
+        <button
+          className={`tab-btn ${activeType === 'all' ? 'active' : ''}`}
+          onClick={() => setActiveType('all')}
+        >
+          Todo
+        </button>
+        <button
+          className={`tab-btn ${activeType === 'email' ? 'active' : ''}`}
+          onClick={() => setActiveType('email')}
+        >
+          Solo Correos
+        </button>
+        <button
+          className={`tab-btn ${activeType === 'phone' ? 'active' : ''}`}
+          onClick={() => setActiveType('phone')}
+        >
+          Solo Teléfonos
+        </button>
+      </div>
+
       {/* Tarjetas de estadísticas */}
       {currentStats && (
         <div className="stats-grid">
-          <StatCard title="Total Intentos"     value={currentStats.total}        subtitle="desde el inicio" />
-          <StatCard title="Registros Exitosos" value={currentStats.success}       accent />
-          <StatCard title="Correos Bloqueados" value={currentStats.blocked}       subtitle="spam o inválidos" />
-          <StatCard title="Tasa de Éxito"      value={`${currentStats.success_rate}%`} subtitle={`${currentStats.duplicates} duplicados`} />
+          <StatCard title={`${typeLabel} validados`} value={currentStats.total}        subtitle="desde el inicio" />
+          <StatCard title="Registros Exitosos"        value={currentStats.success}      accent />
+          <StatCard title="Bloqueados"                value={currentStats.blocked}      subtitle="spam, inválidos, premium" />
+          <StatCard title="Tasa de Éxito"             value={`${currentStats.success_rate}%`} subtitle={`${currentStats.duplicates} duplicados`} />
         </div>
       )}
 
       {/* Gráfica de distribución */}
       {currentStats && (
         <div className="dashboard-section">
-          <h2 className="section-title">Distribución de Resultados</h2>
+          <h2 className="section-title">Distribución de Resultados — {typeLabel}</h2>
           <BarChart byResult={currentStats.by_result || {}} />
         </div>
       )}
+
+      {/* Gestión de blocklist (solo en pestaña Validación Completa) */}
+      {activeTab === 'full' && <BlocklistManager />}
 
       {/* Tabla de logs */}
       <div className="dashboard-section">
@@ -182,7 +317,7 @@ function Dashboard() {
           </h2>
           <input
             type="text"
-            placeholder="Buscar por email, IP o resultado..."
+            placeholder="Buscar por email/teléfono, IP o resultado..."
             value={search}
             onChange={e => setSearch(e.target.value)}
             className="form-control"
@@ -196,7 +331,8 @@ function Dashboard() {
               <tr>
                 <th>#</th>
                 <th>Timestamp</th>
-                <th>Email</th>
+                <th>Tipo</th>
+                <th>Objetivo</th>
                 <th>IP</th>
                 <th>Resultado</th>
                 <th>Mensaje</th>
@@ -205,7 +341,7 @@ function Dashboard() {
             <tbody>
               {filteredLogs.length === 0 ? (
                 <tr>
-                  <td colSpan="6" style={{ textAlign: 'center', color: 'var(--text-muted)', padding: '2rem' }}>
+                  <td colSpan="7" style={{ textAlign: 'center', color: 'var(--text-muted)', padding: '2rem' }}>
                     {search ? 'Sin resultados para esa búsqueda.' : 'Sin registros todavía. Prueba a enviar algún formulario.'}
                   </td>
                 </tr>
@@ -214,7 +350,12 @@ function Dashboard() {
                   <tr key={log.id}>
                     <td style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>{log.id}</td>
                     <td style={{ color: 'var(--text-muted)', fontSize: '0.85rem', whiteSpace: 'nowrap' }}>{log.timestamp}</td>
-                    <td style={{ fontFamily: 'monospace', fontSize: '0.9rem' }}>{log.email}</td>
+                    <td>
+                      <span className={`log-badge ${log.validation_type === 'phone' ? 'badge-info' : 'badge-secondary'}`}>
+                        {log.validation_type === 'phone' ? 'Teléfono' : 'Email'}
+                      </span>
+                    </td>
+                    <td style={{ fontFamily: 'monospace', fontSize: '0.9rem' }}>{log.target || log.email}</td>
                     <td style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>{log.ip || '—'}</td>
                     <td><Badge result={log.result} /></td>
                     <td style={{ color: 'var(--text-muted)', fontSize: '0.85rem', maxWidth: '280px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{log.message}</td>

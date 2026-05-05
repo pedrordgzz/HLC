@@ -60,6 +60,10 @@ services:
     container_name: petstore_auth_lista
     environment:
       - SECRET_KEY=${SECRET_KEY:-petstore_super_secret_key_123}
+      - CENTRAL_URL=${CENTRAL_URL:-http://auth-service:5000}
+      - SYNC_INTERVAL=${SYNC_INTERVAL:-300}
+    depends_on:
+      - auth-service
     volumes:
       - auth_lista_data:/opt/petstore/auth-service-lista-cerrada/data
     networks:

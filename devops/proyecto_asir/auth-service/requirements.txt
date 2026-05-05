@@ -6,4 +6,5 @@ email-validator==2.1.0.post1
 disposable-email-domains==0.0.98
 requests==2.31.0
 itsdangerous==2.1.2
+phonenumbers==8.13.27
 gunicorn==21.2.0
